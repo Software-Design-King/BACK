@@ -9,8 +9,4 @@ public class SoftwareDesignApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SoftwareDesignApplication.class, args);
 	}
-
-
-
-
 }
