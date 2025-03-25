@@ -1,9 +1,6 @@
 package INU.software_design.score.domain;
 import INU.software_design.common.enums.Subject;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -19,6 +16,7 @@ public class Score {
 
     private Long student_id;
 
+    @Enumerated(value = EnumType.STRING)
     private Subject subject;
 
     private Integer score;

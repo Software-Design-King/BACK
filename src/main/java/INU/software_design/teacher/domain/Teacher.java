@@ -1,8 +1,6 @@
 package INU.software_design.teacher.domain;
 import INU.software_design.common.enums.Subject;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -18,7 +16,6 @@ public class Teacher {
 
     private String name;
 
-    private Integer age;
-
+    @Enumerated(value = EnumType.STRING)
     private Subject subject;
 }

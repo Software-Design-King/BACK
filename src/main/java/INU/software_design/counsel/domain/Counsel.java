@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -28,5 +29,6 @@ public class Counsel {
 
     private String plan;
 
+    @CreatedDate
     private LocalDateTime created_at;
 }

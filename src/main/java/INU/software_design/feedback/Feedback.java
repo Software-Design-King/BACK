@@ -3,6 +3,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,7 @@ public class Feedback {
 
     private String title;
 
+    @CreatedDate
     private LocalDateTime created_at;
 
 }
