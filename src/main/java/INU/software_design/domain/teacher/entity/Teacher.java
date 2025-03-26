@@ -1,6 +1,5 @@
-package INU.software_design.student.domain;
-
-import INU.software_design.common.enums.Gender;
+package INU.software_design.domain.teacher.entity;
+import INU.software_design.common.enums.Subject;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,24 +8,14 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Student {
+public class Teacher {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    private Long class_id;
-
     private String name;
 
-    private Integer age;
-
-    private Integer grade;
-
-    private String address;
-
-    private Integer number;
-
     @Enumerated(value = EnumType.STRING)
-    private Gender gender;
+    private Subject subject;
 }

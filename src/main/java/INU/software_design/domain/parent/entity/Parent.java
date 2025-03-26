@@ -1,4 +1,4 @@
-package INU.software_design.Class.domain;
+package INU.software_design.domain.parent.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,19 +7,17 @@ import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
-@Builder
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Class {
+public class Parent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long teacher_id;
+    private Long studentId;
 
-    private Integer grade;
-
-    private Integer class_number;
+    private String name;
 }
