@@ -2,9 +2,10 @@ package INU.software_design.common.exception;
 
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.exception.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(SwPlanException.class)
-    public ResponseEntity<BaseResponse<?>> handleCakeApiBaseException(final CakeyApiBaseException e) {
+    @ExceptionHandler(SwPlanBaseException.class)
+    public ResponseEntity<BaseResponse<?>> handleCakeApiBaseException(final SwPlanBaseException e) {
         return ApiResponseUtil.failure(e.getErrorCode());
     }
 
@@ -179,7 +180,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleInvocationTargetException(final InvocationTargetException e) {
         Throwable cause = e.getCause();
         System.out.println(cause.getMessage());
-        log.error(cause.getMessage());
         return ApiResponseUtil.failure(ErrorBaseCode.INTERNAL_SERVER_ERROR, cause.getMessage());
     }
 
@@ -189,11 +189,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleAllExceptions(final Exception e) {
         if (e.getCause() == null) {
-            log.error(e.getMessage());
+
         } else {
-            log.error("------------------------------------------------------------------------------------------");
-            log.error(e.getMessage() + "\n" + e.getCause().getMessage());
-            log.error("------------------------------------------------------------------------------------------");
+            e.printStackTrace();
         }
         return ApiResponseUtil.failure(ErrorBaseCode.INTERNAL_SERVER_ERROR, e.getMessage());
     }
