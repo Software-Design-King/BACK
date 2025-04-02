@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public abstract class SwPlanBaseException {
+public abstract class SwPlanBaseException extends SwPlanException {
     private final ErrorCode errorCode;
 
     abstract HttpStatus getStatus();
