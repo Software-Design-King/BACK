@@ -10,6 +10,6 @@ public class SwPlanUseException extends SwPlanBaseException{
 
     @Override
     HttpStatus getStatus() {
-        return HttpStatus.UNAUTHORIZED;
+        return HttpStatus.NOT_FOUND;
     }
 }

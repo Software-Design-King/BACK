@@ -20,4 +20,6 @@ public class Parent {
     private Long studentId;
 
     private String name;
+
+    private String socialId;
 }

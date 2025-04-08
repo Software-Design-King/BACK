@@ -3,6 +3,7 @@ package INU.software_design.common.exception;
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.ErrorBaseCode;
+import INU.software_design.common.response.code.ErrorCode;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SwPlanBaseException.class)
     public ResponseEntity<BaseResponse<?>> handleCakeApiBaseException(final SwPlanBaseException e) {
         return ApiResponseUtil.failure(e.getErrorCode());
+    }
+
+    @ExceptionHandler(KakaoException.class)
+    public ResponseEntity<BaseResponse<?>> handleKakaoException(final KakaoException e) {
+        return ApiResponseUtil.failure(ErrorBaseCode.UNAUTHORIZED, e.getMessage());
     }
 
     /**

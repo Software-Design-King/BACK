@@ -18,4 +18,6 @@ public class Teacher {
 
     @Enumerated(value = EnumType.STRING)
     private Subject subject;
+
+    private String socialId;
 }
