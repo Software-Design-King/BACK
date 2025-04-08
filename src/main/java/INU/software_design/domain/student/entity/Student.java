@@ -27,6 +27,8 @@ public class Student {
 
     private Integer number;
 
+    private String socialId;
+
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
 }
