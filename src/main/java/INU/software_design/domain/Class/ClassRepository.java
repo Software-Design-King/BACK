@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface ClassRepository extends JpaRepository<Class, Long> {
     Optional<Class> findByGradeAndClassNumber(int grade, int classNumber);
+    Optional<Class> findByGradeAndClassNumber(Integer grade, Integer classNumber);
+
 
 }
