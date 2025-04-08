@@ -3,7 +3,9 @@ package INU.software_design.domain.auth;
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.SuccessCode;
+import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
+import feign.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,17 @@ public class AuthController {
         return ApiResponseUtil.success(
                 SuccessCode.OK,
                 authService.login(authorization, redirectUrl)
+        );
+    }
+
+    //학생/교사 등록
+    @PostMapping("/enroll/student-teacher")
+    public ResponseEntity<BaseResponse<?>> enrollStudentTeacher(
+            @RequestBody final EnrollStudentTeacherReq enrollStudentTeacherReq
+            ) {
+        authService.enrollStudentTeacher(enrollStudentTeacherReq);
+        return ApiResponseUtil.success(
+                SuccessCode.CREATED
         );
     }
 }

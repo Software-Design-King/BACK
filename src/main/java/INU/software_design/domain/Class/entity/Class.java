@@ -21,5 +21,5 @@ public class Class {
 
     private Integer grade;
 
-    private Integer class_number;
+    private Integer classNumber;
 }

@@ -8,6 +8,7 @@ import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.common.response.code.ErrorCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.Class.entity.Class;
+import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
 import INU.software_design.domain.auth.feign.FeignProvider;
 import INU.software_design.domain.auth.jwt.JwtProperties;
@@ -20,6 +21,7 @@ import INU.software_design.domain.teacher.TeacherRepository;
 import INU.software_design.domain.teacher.entity.Teacher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,10 +52,10 @@ public class AuthService {
                     ((Student) user).getName(),
                     UserType.STUDENT,
                     studentClass.getGrade(),
-                    studentClass.getClass_number(),
+                    studentClass.getClassNumber(),
                     token.getAccessToken(),
                     token.getRefreshToken()
-                    );
+            );
         } else if (user instanceof Parent) {
             Token token = getJwtToken(((Parent) user).getId(), UserType.PARENT);
             Student student = studentRepository.findById(((Parent) user).getStudentId()).orElseThrow(
@@ -66,7 +68,7 @@ public class AuthService {
                     ((Parent) user).getName(),
                     UserType.PARENT,
                     parentClass.getGrade(),
-                    parentClass.getClass_number(),
+                    parentClass.getClassNumber(),
                     token.getAccessToken(),
                     token.getRefreshToken()
             );
@@ -79,12 +81,42 @@ public class AuthService {
                     ((Teacher) user).getName(),
                     UserType.PARENT,
                     teacherClass.getGrade(),
-                    teacherClass.getClass_number(),
+                    teacherClass.getClassNumber(),
                     token.getAccessToken(),
                     token.getRefreshToken()
             );
         } else {
             throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
+        }
+    }
+
+    @Transactional
+    public void enrollStudentTeacher(final EnrollStudentTeacherReq enrollStudentTeacherReq) {
+        final String socialId = feignProvider.getKakaoTokenInfo(enrollStudentTeacherReq.kakaoToken());
+
+        if(enrollStudentTeacherReq.userType() == UserType.STUDENT) {
+            Class findclass = classRepository.findByGradeAndClassNumber(enrollStudentTeacherReq.grade(), enrollStudentTeacherReq.classNum()).orElseThrow(
+                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
+            );
+            Student newStudent = Student.create(
+                    findclass.getId(),
+                    enrollStudentTeacherReq.userName(),
+                    enrollStudentTeacherReq.age(),
+                    enrollStudentTeacherReq.grade(),
+                    enrollStudentTeacherReq.address(),
+                    enrollStudentTeacherReq.number(),
+                    socialId,
+                    enrollStudentTeacherReq.gender()
+            );
+            studentRepository.save(newStudent);
+        } else {
+            Teacher newTeacher = Teacher.create(
+                    enrollStudentTeacherReq.userName(),
+                    socialId
+            );
+            Teacher createTeacher = teacherRepository.save(newTeacher);
+            Class newclass = Class.builder().grade(enrollStudentTeacherReq.grade()).classNumber(enrollStudentTeacherReq.classNum()).teacherId(createTeacher.getId()).build();
+            classRepository.save(newclass); //todo: Class에 학년과 반에 유니크키 걸기
         }
     }
 
