@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "kakaoAuthApiClient", url = "https://kapi.kakao.com")
+@FeignClient(name = "kakaoApiClient", url = "https://kapi.kakao.com")
 public interface KakaoApiClient {
 
     @PostMapping(value = "/v1/user/access_token_info")
