@@ -2,6 +2,8 @@ package INU.software_design.domain.auth.jwt;
 
 import INU.software_design.common.Constants;
 import INU.software_design.common.enums.UserType;
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -75,9 +77,9 @@ public class JwtGenerator {
             final JwtParser jwtParser = getJwtParser();
             return jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) { ///만료된 jwt 예외처리
-            throw new AuthExpiredJwtException();
+            throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR);
         } catch (UnsupportedJwtException | MalformedJwtException | SecurityException | IllegalArgumentException e) { ///잘못된 jwt 예외처리
-            throw new AuthWrongJwtException();
+            throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR);
         }
     }
 
