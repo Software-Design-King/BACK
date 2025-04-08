@@ -8,6 +8,7 @@ import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.common.response.code.ErrorCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.Class.entity.Class;
+import INU.software_design.domain.auth.dto.EnrollParent;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
 import INU.software_design.domain.auth.feign.FeignProvider;
@@ -94,7 +95,7 @@ public class AuthService {
 
     @Transactional
     public void enrollStudentTeacher(final EnrollStudentTeacherReq enrollStudentTeacherReq) {
-        final String socialId = feignProvider.getKakaoTokenInfo(enrollStudentTeacherReq.kakaoToken());
+        final String socialId = getSocialId(enrollStudentTeacherReq.kakaoToken());
 
         if(enrollStudentTeacherReq.userType() == UserType.STUDENT) {
             Class findclass = classRepository.findByGradeAndClassNumber(enrollStudentTeacherReq.grade(), enrollStudentTeacherReq.classNum()).orElseThrow(
@@ -147,7 +148,33 @@ public class AuthService {
         }
     }
 
+    //부모 등록
+    @Transactional
+    public void enrollParent(final EnrollParent enrollParent) {
+        String socialId = getSocialId(enrollParent.kakaoToken());
+
+        Class clazz = classRepository.findByGradeAndClassNumber(enrollParent.grade(), enrollParent.classNum())
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
+
+        // 2. Student 정보 조회
+        Student student = studentRepository.findByNameAndGradeAndNumberAndClassId(
+                enrollParent.childName(), enrollParent.grade(), enrollParent.number(), clazz.getId()
+        ).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
+
+        // 3. Parent 엔티티 생성 및 저장
+        Parent parent = Parent.builder()
+                .name(enrollParent.userName())
+                .studentId(student.getId())
+                .socialId(socialId)
+                .build();
+        parentRepository.save(parent);
+    }
+
     private Token getJwtToken(final long id, final UserType userType) {
         return jwtProvider.issueToken(id, userType);
+    }
+
+    private String getSocialId(final String kakaoToken) {
+        return feignProvider.getKakaoTokenInfo(kakaoToken);
     }
 }

@@ -3,6 +3,7 @@ package INU.software_design.domain.auth;
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.SuccessCode;
+import INU.software_design.domain.auth.dto.EnrollParent;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
 import feign.Response;
@@ -34,6 +35,17 @@ public class AuthController {
             @RequestBody final EnrollStudentTeacherReq enrollStudentTeacherReq
             ) {
         authService.enrollStudentTeacher(enrollStudentTeacherReq);
+        return ApiResponseUtil.success(
+                SuccessCode.CREATED
+        );
+    }
+
+    //부모 등록
+    @PostMapping("/enroll/parent")
+    public ResponseEntity<BaseResponse<?>> enrollParent(
+            @RequestBody final EnrollParent enrollParent
+    ) {
+        authService.enrollParent(enrollParent);
         return ApiResponseUtil.success(
                 SuccessCode.CREATED
         );
