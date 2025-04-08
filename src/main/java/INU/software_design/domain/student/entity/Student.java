@@ -31,4 +31,17 @@ public class Student {
 
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
+
+    public static Student create(
+                         final Long classId,
+                         String name,
+                         Integer age,
+                         Integer grade,
+                         String address,
+                         Integer number,
+                         String socialId,
+                         Gender gender
+                         ) {
+        return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).build();
+    }
 }
