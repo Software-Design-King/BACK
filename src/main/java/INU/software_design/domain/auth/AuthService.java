@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -115,8 +117,33 @@ public class AuthService {
                     socialId
             );
             Teacher createTeacher = teacherRepository.save(newTeacher);
-            Class newclass = Class.builder().grade(enrollStudentTeacherReq.grade()).classNumber(enrollStudentTeacherReq.classNum()).teacherId(createTeacher.getId()).build();
-            classRepository.save(newclass); //todo: Class에 학년과 반에 유니크키 걸기
+
+
+            // 해당 학년+반이 이미 존재하는지 확인
+            Optional<Class> existingClassOpt = classRepository.findByGradeAndClassNumber(
+                    enrollStudentTeacherReq.grade(),
+                    enrollStudentTeacherReq.classNum()
+            );
+
+            if (existingClassOpt.isPresent()) {
+                // 이미 존재하는 경우 → 해당 Class의 teacherId를 새로운 Teacher로 변경
+                Class existingClass = existingClassOpt.get();
+                Class updatedClass = Class.builder()
+                        .id(existingClass.getId())  // id 유지
+                        .grade(existingClass.getGrade())
+                        .classNumber(existingClass.getClassNumber())
+                        .teacherId(createTeacher.getId())  // teacherId만 변경
+                        .build();
+                classRepository.save(updatedClass);
+            } else {
+                // 존재하지 않는 경우 → 새로 생성
+                Class newClass = Class.builder()
+                        .grade(enrollStudentTeacherReq.grade())
+                        .classNumber(enrollStudentTeacherReq.classNum())
+                        .teacherId(createTeacher.getId())
+                        .build();
+                classRepository.save(newClass);
+            }
         }
     }
 
