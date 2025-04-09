@@ -19,7 +19,7 @@ public class StudentListResponse {
         this.students = students;
     }
 
-    public static StudentListResponse of(int grade, List<StudentInfo> students) {
+    public static StudentListResponse create(int grade, List<StudentInfo> students) {
         return new StudentListResponse(grade, students);
     }
 }

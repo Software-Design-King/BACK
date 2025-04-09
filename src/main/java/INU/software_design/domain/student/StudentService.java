@@ -29,11 +29,13 @@ public class StudentService {
     @Transactional
     public StudentListResponse getStudentList(Long teacherId) {
 
-        int grade = findGradeBy(teacherId);
-        List<Student> studentList = findAllStudentBy(grade);
+        Long classId = classRepository.findClassIdByTeacherId(teacherId);
+        int grade = classRepository.findGradeByClassId(classId);
+
+        List<Student> studentList = findAllStudentBy(classId);
         List<StudentInfo> students = transToStudentInfoList(studentList);
 
-        return StudentListResponse.of(grade, students);
+        return StudentListResponse.create(grade, students);
     }
 
     @Transactional
@@ -73,17 +75,13 @@ public class StudentService {
         return classRepository.findClassNumberBy(student.getClassId());
     }
 
-    private int findGradeBy(Long teacherId) {
-        return classRepository.findGradeByTeacherId(teacherId);
-    }
-
     private Student findById(Long studentId) {
         return studentRepository.findById(studentId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
     }
 
-    private List<Student> findAllStudentBy(int grade){
-        return studentRepository.findAllByGrade(grade)
+    private List<Student> findAllStudentBy(Long classId) {
+        return studentRepository.findAllByClassId(classId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
     }
 
