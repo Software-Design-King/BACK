@@ -62,23 +62,22 @@ public class ScoreService {
     }
 
     private void updateStudentScores(StudentScoreRequest request, Student student, Integer semester) {
-        List<Score> existingScores = getScoreList(student.getId(), semester);
+        List<Score> StudentScores = getScoreList(student.getId(), semester);
 
         for (SubjectScore subjectScore : request.getSubjects()) {
             Subject subject = Subject.from(subjectScore);
-            Score existingScore = existingScores.stream()
+            Score Score = StudentScores.stream()
                     .filter(score -> score.getSubject().equals(subject))
                     .findFirst()
                     .orElseThrow(() -> new EntityNotFoundException("해당 과목의 성적을 찾을 수 없습니다."));
-            existingScore.updateScore(subjectScore);
+            Score.updateScore(subjectScore);
         }
     }
 
     private List<SubjectScore> getSubjectScores(Long studentId, Integer semester) {
         List<Score> scoreList = getScoreList(studentId, semester);
-
         return scoreList.stream()
-                .map(score -> new SubjectScore(score.getSubject().toString(), score.getScore()))
+                .map(SubjectScore::of)
                 .toList();
     }
 

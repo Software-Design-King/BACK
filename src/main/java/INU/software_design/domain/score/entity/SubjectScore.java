@@ -11,8 +11,12 @@ public class SubjectScore {
 
     private Integer score;
 
-    public SubjectScore(String name, Integer score) {
+    private SubjectScore(String name, Integer score) {
         this.name = name;
         this.score = score;
+    }
+
+    public static SubjectScore of(Score score) {
+        return new SubjectScore(score.getSubject().toString(), score.getScore());
     }
 }
