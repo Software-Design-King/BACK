@@ -1,9 +1,6 @@
 package INU.software_design.domain.Class.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -11,6 +8,12 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(
+        name = "class",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"grade", "classNumber"})
+        }
+)
 public class Class {
 
     @Id
@@ -21,5 +24,5 @@ public class Class {
 
     private Integer grade;
 
-    private Integer class_number;
+    private Integer classNumber;
 }

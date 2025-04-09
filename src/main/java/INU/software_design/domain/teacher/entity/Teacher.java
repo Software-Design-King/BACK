@@ -16,6 +16,10 @@ public class Teacher {
 
     private String name;
 
-    @Enumerated(value = EnumType.STRING)
-    private Subject subject;
+    private String socialId;
+
+    public static Teacher create (String name, String socialId) {
+        return Teacher.builder().name(name).socialId(socialId).build();
+    }
 }
+
