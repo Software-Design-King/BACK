@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface ClassRepository extends JpaRepository<Class, Long> {
-    Optional<Class> findByGradeAndCxlassNumber(int grade, int classNumber);
+    Optional<Class> findByGradeAndClassNumber(int grade, int classNumber);
 
     @Query("SELECT c.classNumber FROM Class c WHERE c.id = :classId")
     int findClassNumberBy(Long classId);
