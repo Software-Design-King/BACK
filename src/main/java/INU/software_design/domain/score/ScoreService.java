@@ -82,8 +82,11 @@ public class ScoreService {
     }
 
     private List<Score> getScoreList(Long studentId, Integer semester) {
-        return scoreRepository.findAllByStudentIdAndSemester(studentId, semester)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학생의 성적을 찾을 수 없습니다."));
+        if (scoreRepository.findAllByStudentIdAndSemester(studentId, semester).isEmpty()) {
+            throw new EntityNotFoundException("해당 학생의 성적을 찾을 수 없습니다.");
+        } else {
+            return scoreRepository.findAllByStudentIdAndSemester(studentId, semester);
+        }
     }
 
     private Integer getClassRankBy(Long studentId, Integer semester, Student student) {

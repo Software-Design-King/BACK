@@ -35,5 +35,5 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "WHERE sub.studentId = :studentId AND sub.semester = :semester AND sub.grade = :grade)")
     int findClassRankBy(Integer semester, Integer grade, Long studentId);
 
-    Optional<List<Score>> findAllByStudentIdAndSemester(Long studentId, Integer semester);
+    List<Score> findAllByStudentIdAndSemester(Long studentId, Integer semester);
 }
