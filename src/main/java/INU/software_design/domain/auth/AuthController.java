@@ -21,7 +21,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<?>> login(
             @RequestHeader(value = "Authorization") final String authorization,
-            @RequestHeader(value = "RedirectUrl") final String redirectUrl
+            @RequestHeader(value = "Redirecturl") final String redirectUrl
             ) {
         return ApiResponseUtil.success(
                 SuccessCode.OK,

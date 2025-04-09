@@ -2,9 +2,13 @@ package INU.software_design.domain.teacher;
 
 import INU.software_design.domain.teacher.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
+@Repository
+public interface TeacherRepository extends JpaRepository<Teacher, Long> {
+
     Optional<Teacher> findBySocialId(String socialId);
+
 }
