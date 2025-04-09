@@ -29,8 +29,8 @@ public class StudentService {
     @Transactional
     public StudentListResponse getStudentList(Long teacherId) {
 
-        Long classId = classRepository.findClassIdByTeacherId(teacherId);
-        int grade = classRepository.findGradeByClassId(classId);
+        Long classId = classRepository.findIdByTeacherId(teacherId);
+        int grade = classRepository.findGradeById(classId);
 
         List<Student> studentList = findAllStudentBy(classId);
         List<StudentInfo> students = transToStudentInfoList(studentList);
