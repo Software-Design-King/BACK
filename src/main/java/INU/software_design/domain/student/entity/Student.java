@@ -41,17 +41,6 @@ public class Student {
 
     private String parentContact;
 
-    public void update(StudentInfoRequest request) {
-        this.name = request.getName();
-        this.age = request.getAge();
-        this.grade = request.getGrade();
-        this.address = request.getAddress();
-        this.number = request.getNumber();
-        this.gender = request.getGender();
-        this.birthDate = request.getBirthDate();
-        this.contact = request.getContact();
-        this.parentContact = request.getParentContact();
-
     public static Student create(
                          final Long classId,
                          String name,
@@ -63,5 +52,17 @@ public class Student {
                          Gender gender
                          ) {
         return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).build();
+    }
+
+    public void update(StudentInfoRequest request) {
+        this.name = request.getName();
+        this.age = request.getAge();
+        this.grade = request.getGrade();
+        this.address = request.getAddress();
+        this.number = request.getNumber();
+        this.gender = request.getGender();
+        this.birthDate = request.getBirthDate();
+        this.contact = request.getContact();
+        this.parentContact = request.getParentContact();
     }
 }
