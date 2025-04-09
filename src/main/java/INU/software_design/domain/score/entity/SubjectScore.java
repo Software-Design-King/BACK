@@ -16,7 +16,7 @@ public class SubjectScore {
         this.score = score;
     }
 
-    public static SubjectScore of(Score score) {
+    public static SubjectScore create(Score score) {
         return new SubjectScore(score.getSubject().toString(), score.getScore());
     }
 }

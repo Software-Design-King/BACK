@@ -89,7 +89,7 @@ public class StudentService {
 
     private static List<StudentInfo> transToStudentInfoList(List<Student> studentList) {
         return studentList.stream()
-                .map(StudentInfo::of)
+                .map(StudentInfo::create)
                 .toList();
     }
 }

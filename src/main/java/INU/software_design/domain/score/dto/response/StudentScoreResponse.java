@@ -25,7 +25,7 @@ public class StudentScoreResponse {
         this.subjects = subjects;
     }
 
-    public static StudentScoreResponse of(Integer totalScore, Integer wholeRank, Integer classRank, List<SubjectScore> subjects) {
+    public static StudentScoreResponse create(Integer totalScore, Integer wholeRank, Integer classRank, List<SubjectScore> subjects) {
         return new StudentScoreResponse(totalScore, wholeRank, classRank, subjects);
     }
 }

@@ -29,7 +29,7 @@ public class ScoreService {
 
         saveStudentScores(request, student, semester);
 
-        return StudentScoreResponse.of(
+        return StudentScoreResponse.create(
                 getTotalScore(studentId, semester),
                 getWholeRankBy(studentId, semester),
                 getClassRankBy(studentId, semester, student),
@@ -45,7 +45,7 @@ public class ScoreService {
 
         updateStudentScores(request, student, semester);
 
-        return StudentScoreResponse.of(
+        return StudentScoreResponse.create(
                 getTotalScore(studentId, semester),
                 getWholeRankBy(studentId, semester),
                 getClassRankBy(studentId, semester, student),
@@ -77,7 +77,7 @@ public class ScoreService {
     private List<SubjectScore> getSubjectScores(Long studentId, Integer semester) {
         List<Score> scoreList = getScoreList(studentId, semester);
         return scoreList.stream()
-                .map(SubjectScore::of)
+                .map(SubjectScore::create)
                 .toList();
     }
 
@@ -101,7 +101,7 @@ public class ScoreService {
     private void saveStudentScores(StudentScoreRequest request, Student student, Integer semester) {
         for (SubjectScore subjectScore : request.getSubjects()) {
             Subject subject = Subject.from(subjectScore);
-            Score score = Score.of(student, subject, subjectScore, semester);
+            Score score = Score.create(student, subject, subjectScore, semester);
             scoreRepository.save(score);
         }
     }

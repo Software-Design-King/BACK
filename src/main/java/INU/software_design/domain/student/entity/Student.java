@@ -49,9 +49,12 @@ public class Student {
                          String address,
                          Integer number,
                          String socialId,
-                         Gender gender
+                         Gender gender,
+                         LocalDate birthDate,
+                         String contact,
+                         String parentContact
                          ) {
-        return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).build();
+        return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).birthDate(birthDate).contact(contact).parentContact(parentContact).build();
     }
 
     public void update(StudentInfoRequest request) {

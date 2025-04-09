@@ -32,7 +32,7 @@ public class Score {
         this.semester = semester;
     }
 
-    public static Score of(Student student, Subject subject, SubjectScore request, Integer semester) {
+    public static Score create(Student student, Subject subject, SubjectScore request, Integer semester) {
         return new Score(student, subject, request.getScore(), semester);
     }
 

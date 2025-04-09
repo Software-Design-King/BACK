@@ -16,7 +16,7 @@ public class StudentInfo {
         this.name = name;
     }
 
-    public static StudentInfo of(Student student) {
+    public static StudentInfo create(Student student) {
         return new StudentInfo(student.getId(), student.getName());
     }
 }
