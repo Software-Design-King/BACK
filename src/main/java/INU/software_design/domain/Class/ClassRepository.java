@@ -12,11 +12,13 @@ public interface ClassRepository extends JpaRepository<Class, Long> {
     @Query("SELECT c.classNumber FROM Class c WHERE c.id = :classId")
     int findClassNumberBy(Long classId);
 
+    @Query("SELECT c.id FROM Class c WHERE c.teacherId = :teacherId")
     Long findIdByTeacherId(Long teacherId);
 
+    @Query("SELECT c.grade FROM Class c WHERE c.id = :classId")
     int findGradeById(Long classId);
 
+    @Query("SELECT c FROM Class c WHERE c.teacherId = :teacherId")
     Optional<Class> findByTeacherId(Long teacherId);
-
 
 }

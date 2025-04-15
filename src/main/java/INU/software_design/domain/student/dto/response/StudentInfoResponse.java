@@ -22,8 +22,6 @@ public class StudentInfoResponse {
 
     private String entranceDate;
 
-    private String schoolName;
-
     private int grade;
 
     private int classNum;
@@ -32,7 +30,7 @@ public class StudentInfoResponse {
 
     @Builder
     private StudentInfoResponse(String name, String birthDate, Gender gender, String address,
-                               String contact, String entranceDate, String schoolName,
+                               String contact, String entranceDate,
                                int grade, int classNum, int studentNum) {
         this.name = name;
         this.birthDate = birthDate;
@@ -40,14 +38,12 @@ public class StudentInfoResponse {
         this.address = address;
         this.contact = contact;
         this.entranceDate = entranceDate;
-        this.schoolName = schoolName;
         this.grade = grade;
         this.classNum = classNum;
         this.studentNum = studentNum;
     }
 
     public static StudentInfoResponse of(Student student, Integer classNum) {
-        // TODO : schoolName 처리
         return StudentInfoResponse.builder()
                 .name(student.getName())
                 .birthDate(student.getBirthDate().toString())

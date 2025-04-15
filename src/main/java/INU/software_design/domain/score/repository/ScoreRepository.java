@@ -1,7 +1,7 @@
-package INU.software_design.domain.score;
+package INU.software_design.domain.score.repository;
 
+import INU.software_design.common.enums.Subject;
 import INU.software_design.domain.score.entity.Score;
-import INU.software_design.domain.score.entity.SubjectScore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,8 +25,9 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "HAVING SUM(s.score) > (SELECT SUM(sub.score) " +
             "FROM Score sub " +
             "WHERE sub.studentId = :studentId AND sub.semester = :semester)")
-    int findWholeRankBy(Integer semester, Long studentId);
+    Optional<Integer> findWholeRankBy(Integer semester, Long studentId);
 
+    // 반 학생 중 학생의 순위를 구하는 쿼리 (총점 기준)
     @Query("SELECT COUNT(DISTINCT s.studentId) " +
             "FROM Score s " +
             "WHERE s.semester = :semester AND s.grade = :grade AND s.studentId <> :studentId " +
@@ -34,7 +35,7 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "HAVING SUM(s.score) > (SELECT SUM(sub.score) " +
             "FROM Score sub " +
             "WHERE sub.studentId = :studentId AND sub.semester = :semester AND sub.grade = :grade)")
-    int findClassRankBy(Integer semester, Integer grade, Long studentId);
+    Optional<Integer> findClassRankBy(Integer semester, Integer grade, Long studentId);
 
     List<Score> findAllByStudentIdAndSemester(Long studentId, Integer semester);
 
@@ -53,4 +54,6 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "WHERE sc.grade = :grade AND sc.semester = :semester AND st.classId = :classId " +
             "GROUP BY sc.studentId")
     List<Object[]> findAllTotalScoresByClassAndSemester(@Param("grade") int grade, @Param("semester") int semester, @Param("classId") Long classId);
+
+    boolean existsByStudentIdAndSubject(Long studentId, Subject subject);
 }

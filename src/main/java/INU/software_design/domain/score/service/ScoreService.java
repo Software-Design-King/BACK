@@ -1,9 +1,9 @@
-package INU.software_design.domain.score;
+package INU.software_design.domain.score.service;
 
-import INU.software_design.common.enums.Subject;
+import INU.software_design.domain.score.repository.ScoreRepository;
 import INU.software_design.domain.score.entity.Score;
 import INU.software_design.domain.score.entity.SubjectScore;
-import INU.software_design.domain.student.StudentRepository;
+import INU.software_design.domain.student.repository.StudentRepository;
 import INU.software_design.domain.student.entity.Student;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
 import INU.software_design.domain.score.dto.response.StudentScoreResponse;
@@ -103,12 +103,11 @@ public class ScoreService {
         List<Score> StudentScores = getScoreList(student.getId(), semester);
 
         for (SubjectScore subjectScore : request.getSubjects()) {
-            Subject subject = Subject.from(subjectScore);
             Score Score = StudentScores.stream()
-                    .filter(score -> score.getSubject().equals(subject))
+                    .filter(score -> score.getSubject().equals(subjectScore.getName()))
                     .findFirst()
                     .orElseThrow(() -> new EntityNotFoundException("해당 과목의 성적을 찾을 수 없습니다."));
-            Score.updateScore(subjectScore);
+            Score.updateScore(subjectScore.getScore());
         }
     }
 
@@ -128,11 +127,11 @@ public class ScoreService {
     }
 
     private Integer getClassRankBy(Long studentId, Integer semester, Student student) {
-        return scoreRepository.findClassRankBy(semester, student.getGrade(), studentId);
+        return scoreRepository.findClassRankBy(semester, student.getGrade(), studentId).orElse(1);
     }
 
     private Integer getWholeRankBy(Long studentId, Integer semester) {
-        return scoreRepository.findWholeRankBy(semester, studentId);
+        return scoreRepository.findWholeRankBy(semester, studentId).orElse(1);
     }
 
     private Integer getTotalScore(Long studentId, Integer semester) {
@@ -141,10 +140,16 @@ public class ScoreService {
 
     private void saveStudentScores(StudentScoreRequest request, Student student, Integer semester) {
         for (SubjectScore subjectScore : request.getSubjects()) {
-            Subject subject = Subject.from(subjectScore);
-            Score score = Score.create(student, subject, subjectScore, semester);
+            if (isEnrolled(student, subjectScore)) {
+                throw new IllegalArgumentException("이미 등록된 과목입니다.");
+            }
+            Score score = Score.create(student, subjectScore.getName(), subjectScore, semester);
             scoreRepository.save(score);
         }
+    }
+
+    private boolean isEnrolled(Student student, SubjectScore subjectScore) {
+        return scoreRepository.existsByStudentIdAndSubject(student.getId(), subjectScore.getName());
     }
 
     private Student findStudentBy(Long studentId) {
