@@ -25,6 +25,8 @@ public class SecurityConfig {
     private static final String[] whiteList = {
             "/actuator/health",
             "/user/login",
+            "user/enroll/student-teacher",
+            "/enroll/parent"
     };
 
     @Bean

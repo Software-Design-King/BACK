@@ -122,7 +122,6 @@ public class AuthService {
             );
             Teacher createTeacher = teacherRepository.save(newTeacher);
 
-
             // 해당 학년+반이 이미 존재하는지 확인
             Optional<Class> existingClassOpt = classRepository.findByGradeAndClassNumber(
                     enrollStudentTeacherReq.grade(),
