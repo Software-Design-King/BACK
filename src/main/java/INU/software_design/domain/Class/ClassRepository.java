@@ -15,4 +15,8 @@ public interface ClassRepository extends JpaRepository<Class, Long> {
     Long findIdByTeacherId(Long teacherId);
 
     int findGradeById(Long classId);
+
+    Optional<Class> findByTeacherId(Long teacherId);
+
+
 }

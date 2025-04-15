@@ -17,7 +17,7 @@ public class UserTypeResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(UserType.class)
+        return parameter.getParameterType().equals(INU.software_design.common.enums.UserType.class)
                 && parameter.hasParameterAnnotation(UserType.class);
     }
 

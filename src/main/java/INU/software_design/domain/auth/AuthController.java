@@ -1,8 +1,10 @@
 package INU.software_design.domain.auth;
 
+import INU.software_design.common.resolver.UserId;
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.SuccessCode;
+import INU.software_design.common.usertype.UserType;
 import INU.software_design.domain.auth.dto.EnrollParent;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
@@ -34,9 +36,9 @@ public class AuthController {
     public ResponseEntity<BaseResponse<?>> enrollStudentTeacher(
             @RequestBody final EnrollStudentTeacherReq enrollStudentTeacherReq
             ) {
-        authService.enrollStudentTeacher(enrollStudentTeacherReq);
         return ApiResponseUtil.success(
-                SuccessCode.CREATED
+                SuccessCode.CREATED,
+                authService.enrollStudentTeacher(enrollStudentTeacherReq)
         );
     }
 
@@ -48,6 +50,18 @@ public class AuthController {
         authService.enrollParent(enrollParent);
         return ApiResponseUtil.success(
                 SuccessCode.CREATED
+        );
+    }
+
+    //유저 정보 조회
+    @GetMapping("/info")
+    public ResponseEntity<BaseResponse<?>> getUserInfo(
+            @UserId final Long userId,
+            @UserType final INU.software_design.common.enums.UserType userType
+    ) {
+        return ApiResponseUtil.success(
+                SuccessCode.OK,
+                authService.getUserInfo(userId, userType)
         );
     }
 }
