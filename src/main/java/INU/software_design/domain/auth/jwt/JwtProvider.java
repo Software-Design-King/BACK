@@ -5,10 +5,13 @@ import INU.software_design.common.enums.Token;
 import INU.software_design.common.enums.UserType;
 import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.response.code.ErrorBaseCode;
+import io.jsonwebtoken.Claims;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.repository.cdi.Eager;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -54,5 +57,10 @@ public class JwtProvider {
         } catch (NumberFormatException e) {
             throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR); ///아무 값이 없으면 예외 던지기
         }
+    }
+
+    public UserType getUserType(String token) {
+        Claims claims = jwtGenerator.parseToken(token).getBody();
+        return UserType.valueOf((String) claims.get("userType"));
     }
 }
