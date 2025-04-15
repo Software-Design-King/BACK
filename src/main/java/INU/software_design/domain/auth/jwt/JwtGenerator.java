@@ -26,11 +26,11 @@ public class JwtGenerator {
         final Date expireDate = generateExpirationDate(now, true);
 
         final Claims claims = Jwts.claims();
-        claims.put("userType", userType);
+        claims.put("userId", userId);                     // ✅ 명시적 claim
+        claims.put("userType", userType.name());          // ✅ 명시적 claim
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
                 .setClaims(claims)
                 .setExpiration(expireDate)
@@ -45,11 +45,11 @@ public class JwtGenerator {
         final Date expireDate = generateExpirationDate(now, false);
 
         final Claims claims = Jwts.claims();
-        claims.put("userType", userType);
+        claims.put("userId", userId);                     // ✅ 명시적 claim
+        claims.put("userType", userType.name());          // ✅ 명시적 claim
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
                 .setClaims(claims)
                 .setExpiration(expireDate)
@@ -78,9 +78,9 @@ public class JwtGenerator {
             final JwtParser jwtParser = getJwtParser();
             return jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) { ///만료된 jwt 예외처리
-            throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR);
+            throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
         } catch (UnsupportedJwtException | MalformedJwtException | SecurityException | IllegalArgumentException e) { ///잘못된 jwt 예외처리
-            throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR);
+            throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
         }
     }
 

@@ -8,9 +8,7 @@ import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.common.response.code.ErrorCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.Class.entity.Class;
-import INU.software_design.domain.auth.dto.EnrollParent;
-import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
-import INU.software_design.domain.auth.dto.LoginSuccessRes;
+import INU.software_design.domain.auth.dto.*;
 import INU.software_design.domain.auth.feign.FeignProvider;
 import INU.software_design.domain.auth.jwt.JwtProperties;
 import INU.software_design.domain.auth.jwt.JwtProvider;
@@ -49,7 +47,7 @@ public class AuthService {
         if (user instanceof Student) {
             Token token = getJwtToken(((Student) user).getId(), UserType.STUDENT);
             Class studentClass = classRepository.findById(((Student) user).getClassId()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
+                    () -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY)
             );
             return LoginSuccessRes.create(
                     ((Student) user).getName(),
@@ -62,10 +60,10 @@ public class AuthService {
         } else if (user instanceof Parent) {
             Token token = getJwtToken(((Parent) user).getId(), UserType.PARENT);
             Student student = studentRepository.findById(((Parent) user).getStudentId()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
+                    () -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY)
             );
             Class parentClass = classRepository.findById(student.getClassId()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
+                    () -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY)
             );
             return LoginSuccessRes.create(
                     ((Parent) user).getName(),
@@ -78,7 +76,7 @@ public class AuthService {
         } else if (user instanceof Teacher) {
             Token token = getJwtToken(((Teacher) user).getId(), UserType.TEACHER);
             Class teacherClass = classRepository.findById(((Teacher) user).getId()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
+                    () -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY)
             );
             return LoginSuccessRes.create(
                     ((Teacher) user).getName(),
@@ -94,7 +92,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void enrollStudentTeacher(final EnrollStudentTeacherReq enrollStudentTeacherReq) {
+    public EnrollStudentTeacherRes enrollStudentTeacher(final EnrollStudentTeacherReq enrollStudentTeacherReq) {
         final String socialId = getSocialId(enrollStudentTeacherReq.kakaoToken());
 
         if(enrollStudentTeacherReq.userType() == UserType.STUDENT) {
@@ -114,14 +112,19 @@ public class AuthService {
                     enrollStudentTeacherReq.contact(),
                     enrollStudentTeacherReq.parentContact()
             );
-            studentRepository.save(newStudent);
+            Student savedStudent = studentRepository.save(newStudent);
+
+            Token token = getJwtToken(savedStudent.getId(), UserType.STUDENT);
+            return EnrollStudentTeacherRes.of(savedStudent.getId(), token.getAccessToken(), token.getRefreshToken());
+
         } else {
             Teacher newTeacher = Teacher.create(
                     enrollStudentTeacherReq.userName(),
                     socialId
             );
-            Teacher createTeacher = teacherRepository.save(newTeacher);
+            Teacher savedTeacher = teacherRepository.save(newTeacher);
 
+            Token token = getJwtToken((savedTeacher.getId()), UserType.TEACHER);
 
             // 해당 학년+반이 이미 존재하는지 확인
             Optional<Class> existingClassOpt = classRepository.findByGradeAndClassNumber(
@@ -136,7 +139,7 @@ public class AuthService {
                         .id(existingClass.getId())  // id 유지
                         .grade(existingClass.getGrade())
                         .classNumber(existingClass.getClassNumber())
-                        .teacherId(createTeacher.getId())  // teacherId만 변경
+                        .teacherId(savedTeacher.getId())  // teacherId만 변경
                         .build();
                 classRepository.save(updatedClass);
             } else {
@@ -144,10 +147,12 @@ public class AuthService {
                 Class newClass = Class.builder()
                         .grade(enrollStudentTeacherReq.grade())
                         .classNumber(enrollStudentTeacherReq.classNum())
-                        .teacherId(createTeacher.getId())
+                        .teacherId(savedTeacher.getId())
                         .build();
                 classRepository.save(newClass);
             }
+
+            return EnrollStudentTeacherRes.of(savedTeacher.getId(), token.getAccessToken(), token.getRefreshToken());
         }
     }
 
@@ -171,6 +176,63 @@ public class AuthService {
                 .socialId(socialId)
                 .build();
         parentRepository.save(parent);
+    }
+
+    //유저 정보 조회
+    public UserInfoRes getUserInfo(Long userId, UserType userType) {
+        return switch (userType) {
+            case STUDENT -> getStudentInfo(userId);
+            case PARENT -> getParentInfo(userId);
+            case TEACHER -> getTeacherInfo(userId);
+        };
+    }
+
+    private UserInfoRes getStudentInfo(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        int classNumber = getClassNumber(student.getClassId());
+
+        return UserInfoRes.of(
+                student.getName(),
+                student.getGrade() + "학년 " + classNumber + "반",
+                student.getNumber(), // 이게 학생 번호
+                UserType.STUDENT
+        );
+    }
+
+    private UserInfoRes getParentInfo(Long parentId) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        Student child = studentRepository.findById(parent.getStudentId())
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        return UserInfoRes.of(
+                parent.getName(),
+                child.getName() + " 학생의 학부모",
+                UserType.PARENT
+        );
+    }
+
+    private UserInfoRes getTeacherInfo(Long teacherId) {
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        Class clazz = classRepository.findByTeacherId(teacherId)
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        return UserInfoRes.of(
+                teacher.getName(),
+                clazz.getGrade() + "학년 " + clazz.getClassNumber() + "반 담임",
+                UserType.TEACHER
+        );
+    }
+
+    private int getClassNumber(Long classId) {
+        return classRepository.findById(classId)
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY))
+                .getClassNumber();
     }
 
     private Token getJwtToken(final long id, final UserType userType) {
