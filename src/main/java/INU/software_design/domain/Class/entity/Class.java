@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Builder
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(
         name = "class",
@@ -20,9 +20,9 @@ public class Class {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long teacherId;
+    private long teacherId;
 
-    private Integer grade;
+    private int grade;
 
-    private Integer classNumber;
+    private int classNumber;
 }

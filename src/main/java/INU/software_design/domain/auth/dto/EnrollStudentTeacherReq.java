@@ -3,6 +3,8 @@ package INU.software_design.domain.auth.dto;
 import INU.software_design.common.enums.Gender;
 import INU.software_design.common.enums.UserType;
 
+import java.time.LocalDate;
+
 public record EnrollStudentTeacherReq(
         String userName,
         int grade,
@@ -12,6 +14,9 @@ public record EnrollStudentTeacherReq(
         Integer age,
         String kakaoToken,
         String address,
-        Gender gender
+        Gender gender,
+        LocalDate birthDate,
+        String contact,
+        String parentContact
 ) {
 }

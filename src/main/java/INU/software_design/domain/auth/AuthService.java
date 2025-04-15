@@ -109,7 +109,10 @@ public class AuthService {
                     enrollStudentTeacherReq.address(),
                     enrollStudentTeacherReq.number(),
                     socialId,
-                    enrollStudentTeacherReq.gender()
+                    enrollStudentTeacherReq.gender(),
+                    enrollStudentTeacherReq.birthDate(),
+                    enrollStudentTeacherReq.contact(),
+                    enrollStudentTeacherReq.parentContact()
             );
             studentRepository.save(newStudent);
         } else {
