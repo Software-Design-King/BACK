@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String accessToken = getAccessToken(request);
 
         // userId 및 userType 추출
-        final long userId = jwtProvider.getUserIdFromSubject(accessToken);
+        final long userId = jwtProvider.getUserIdFromClaims(accessToken);
         final UserType userType = jwtProvider.getUserType(accessToken);
 
         // 인증 객체 생성
