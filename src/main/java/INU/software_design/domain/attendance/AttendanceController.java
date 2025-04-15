@@ -19,7 +19,7 @@ public class AttendanceController {
     ) {
         return ApiResponseUtil.success(
                 SuccessCode.OK,
-                attendanceService.getAttendacne(studentId)
+                attendanceService.getAttendance(studentId)
         );
     }
 
