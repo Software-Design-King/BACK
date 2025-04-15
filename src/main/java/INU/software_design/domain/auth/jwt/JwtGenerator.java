@@ -51,6 +51,7 @@ public class JwtGenerator {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
+                .setClaims(claims)
                 .setExpiration(expireDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();

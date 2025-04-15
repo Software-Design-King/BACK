@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum AttendanceType {
     LATE("지각"),
     LEAVE("조퇴"),
-    ABSENT("결석");
+    ABSENT("결석"),
+	SICK("병결"),
+	;
 
     private final String value;
 
