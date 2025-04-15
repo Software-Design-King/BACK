@@ -4,6 +4,7 @@ import INU.software_design.domain.score.entity.Score;
 import INU.software_design.domain.score.entity.SubjectScore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
 
 	List<Score> findByStudentIdAndGradeAndSemester(Long studentId, int grade, int semester);
 
+    
     @Query("SELECT s.studentId, SUM(s.score) as totalScore " +
             "FROM Score s " +
             "WHERE s.grade = :grade AND s.semester = :semester " +
