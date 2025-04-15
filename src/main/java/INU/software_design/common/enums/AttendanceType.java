@@ -7,8 +7,7 @@ public enum AttendanceType {
     LATE("지각"),
     LEAVE("조퇴"),
     ABSENT("결석"),
-	SICK("병결"),
-	;
+	SICK("병결");
 
     private final String value;
 
@@ -24,7 +23,7 @@ public enum AttendanceType {
     @JsonCreator
     public static AttendanceType fromValue(String value) {
         for (AttendanceType type : AttendanceType.values()) {
-            if (type.value.equals(value)) {
+            if (type.value.equals(value) || type.name().equals(value)) {
                 return type;
             }
         }
