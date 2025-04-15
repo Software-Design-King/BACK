@@ -1,8 +1,8 @@
-package INU.software_design.domain.student;
+package INU.software_design.domain.student.service;
 
 import INU.software_design.domain.Class.ClassRepository;
-import INU.software_design.domain.attendance.Attendance;
-import INU.software_design.domain.attendance.AttendanceRepository;
+import INU.software_design.domain.attendance.entity.Attendance;
+import INU.software_design.domain.attendance.repository.AttendanceRepository;
 import INU.software_design.domain.student.dto.request.AttendanceRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
 import INU.software_design.domain.student.dto.response.AttendanceResponse;
@@ -10,6 +10,7 @@ import INU.software_design.domain.student.dto.response.StudentInfoResponse;
 import INU.software_design.domain.student.dto.response.StudentListResponse;
 import INU.software_design.domain.student.entity.Student;
 import INU.software_design.domain.student.entity.StudentInfo;
+import INU.software_design.domain.student.repository.StudentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

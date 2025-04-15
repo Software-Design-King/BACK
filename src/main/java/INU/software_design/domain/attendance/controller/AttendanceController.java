@@ -1,8 +1,9 @@
-package INU.software_design.domain.attendance;
+package INU.software_design.domain.attendance.controller;
 
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.SuccessCode;
+import INU.software_design.domain.attendance.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
