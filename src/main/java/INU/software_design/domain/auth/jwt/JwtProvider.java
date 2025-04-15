@@ -45,22 +45,52 @@ public class JwtProvider {
         throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR); ///아무 값이 없으면 예외 던지기
     }
 
-    //jwtSubject에서 userId추출
-    public long getUserIdFromSubject(final String token) {
-        final String subject = jwtGenerator.parseToken(token)
-                .getBody()
-                .getSubject();
+//    //jwtSubject에서 userId추출
+//    public long getUserIdFromSubject(final String token) {
+//        final String subject = jwtGenerator.parseToken(token)
+//                .getBody()
+//                .getSubject();
+//
+//        //subject가 숫자문자열인지 예외처리
+//        try {
+//            return Long.parseLong(subject);
+//        } catch (NumberFormatException e) {
+//            throw new SwPlanUseException(ErrorBaseCode.CONFLICT); ///아무 값이 없으면 예외 던지기
+//        }
+//    }
+//
+//    public UserType getUserType(String token) {
+//        Claims claims = jwtGenerator.parseToken(token).getBody();
+//        return UserType.valueOf((String) claims.get("userType"));
+//    }
 
-        //subject가 숫자문자열인지 예외처리
+    public long getUserIdFromClaims(final String token) {
+        Claims claims = jwtGenerator.parseToken(token).getBody();
+        Object userId = claims.get("userId");
+
+        if (userId == null) {
+            throw new SwPlanUseException(ErrorBaseCode.UNAUTHORIZED);
+        }
+
         try {
-            return Long.parseLong(subject);
+            return Long.parseLong(userId.toString());
         } catch (NumberFormatException e) {
-            throw new SwPlanUseException(ErrorBaseCode.INTERNAL_SERVER_ERROR); ///아무 값이 없으면 예외 던지기
+            throw new SwPlanUseException(ErrorBaseCode.UNAUTHORIZED);
         }
     }
 
-    public UserType getUserType(String token) {
+    public UserType getUserType(final String token) {
         Claims claims = jwtGenerator.parseToken(token).getBody();
-        return UserType.valueOf((String) claims.get("userType"));
+        Object type = claims.get("userType");
+
+        if (type == null) {
+            throw new SwPlanUseException(ErrorBaseCode.UNAUTHORIZED);
+        }
+
+        try {
+            return UserType.valueOf(type.toString());
+        } catch (IllegalArgumentException e) {
+            throw new SwPlanUseException(ErrorBaseCode.UNAUTHORIZED);
+        }
     }
 }
