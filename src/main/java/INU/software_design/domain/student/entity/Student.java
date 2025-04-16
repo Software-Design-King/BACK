@@ -33,6 +33,7 @@ public class Student {
     private String socialId;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "gender", length = 20)
     private Gender gender;
 
     private LocalDate birthDate;

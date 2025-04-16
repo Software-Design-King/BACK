@@ -1,10 +1,9 @@
-package INU.software_design.domain.attendance;
+package INU.software_design.domain.attendance.entity;
 import INU.software_design.common.enums.AttendanceType;
 import INU.software_design.domain.student.dto.request.AttendanceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +18,7 @@ public class Attendance {
     private Long studentId;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "type", length = 20)
     private AttendanceType type;
 
     private LocalDateTime date;

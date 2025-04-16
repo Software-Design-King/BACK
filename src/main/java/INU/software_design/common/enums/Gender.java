@@ -21,7 +21,7 @@ public enum Gender {
     @JsonCreator
     public static Gender gender(String value) {
         for (Gender gender : Gender.values()) {
-            if (gender.value.equals(value)) {
+            if (gender.value.equals(value) || gender.name().equals(value)) {
                 return gender;
             }
         }

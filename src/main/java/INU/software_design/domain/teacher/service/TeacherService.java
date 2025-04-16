@@ -1,4 +1,4 @@
-package INU.software_design.domain.teacher;
+package INU.software_design.domain.teacher.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

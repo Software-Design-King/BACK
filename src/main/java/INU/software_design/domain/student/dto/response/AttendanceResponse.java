@@ -1,7 +1,7 @@
 package INU.software_design.domain.student.dto.response;
 
 import INU.software_design.common.enums.AttendanceType;
-import INU.software_design.domain.attendance.Attendance;
+import INU.software_design.domain.attendance.entity.Attendance;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,7 @@
-package INU.software_design.domain.attendance;
+package INU.software_design.domain.attendance.repository;
 
 import INU.software_design.common.enums.AttendanceType;
+import INU.software_design.domain.attendance.entity.Attendance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

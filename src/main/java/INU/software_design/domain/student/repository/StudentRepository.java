@@ -1,4 +1,4 @@
-package INU.software_design.domain.student;
+package INU.software_design.domain.student.repository;
 
 import INU.software_design.domain.student.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;

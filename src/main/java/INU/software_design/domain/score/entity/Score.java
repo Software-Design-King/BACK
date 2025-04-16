@@ -16,6 +16,7 @@ public class Score {
     private Long studentId;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "subject", length = 20)
     private Subject subject;
 
     private Integer score;
@@ -36,7 +37,7 @@ public class Score {
         return new Score(student, subject, request.getScore(), semester);
     }
 
-    public void updateScore(SubjectScore subjectScore) {
-        this.score = subjectScore.getScore();
+    public void updateScore(int score) {
+        this.score = score;
     }
 }

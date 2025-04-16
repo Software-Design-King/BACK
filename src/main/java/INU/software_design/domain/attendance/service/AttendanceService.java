@@ -1,7 +1,9 @@
-package INU.software_design.domain.attendance;
+package INU.software_design.domain.attendance.service;
 
 import INU.software_design.common.enums.AttendanceType;
 import INU.software_design.domain.attendance.dto.AttendanceSummaryRes;
+import INU.software_design.domain.attendance.entity.Attendance;
+import INU.software_design.domain.attendance.repository.AttendanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
