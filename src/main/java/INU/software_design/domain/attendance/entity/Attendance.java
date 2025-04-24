@@ -46,6 +46,22 @@ public class Attendance {
                 .build();
     }
 
+    public static Attendance create(
+            Long studentId,
+            AttendanceType type,
+            LocalDateTime date,
+            String title,
+            String reason
+    ) {
+        return Attendance.builder()
+                .studentId(studentId)
+                .type(type)
+                .date(date)
+                .title(title)
+                .reason(reason)
+                .build();
+    }
+
     public void update(AttendanceRequest request) {
         this.type = request.getType();
         this.date = request.getDate();
