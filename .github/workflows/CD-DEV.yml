@@ -1,0 +1,26 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://planking-dev-db.cpoey40gutx5.ap-northeast-2.rds.amazonaws.com:3306/rdsdb
+    username: plankingdevdb
+    password: plankingdbdev
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+jwt:
+  secret: swkinggkgingkgingggjhihikignsweardfdfdfdfdfdfdfekinggg!!
+  access-token-expiration-time: 31536000000
+  refresh-token-expiration-time: 31536000000
+kakao:
+  clientId: 5e2053f8ae5352d5fd4d7f5a8a311ce7
+server:
+  http2:
+    enabled: true
