@@ -1,26 +1,68 @@
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://planking-dev-db.cpoey40gutx5.ap-northeast-2.rds.amazonaws.com:3306/rdsdb
-    username: plankingdevdb
-    password: plankingdbdev
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-jwt:
-  secret: swkinggkgingkgingggjhihikignsweardfdfdfdfdfdfdfekinggg!!
-  access-token-expiration-time: 31536000000
-  refresh-token-expiration-time: 31536000000
-kakao:
-  clientId: 5e2053f8ae5352d5fd4d7f5a8a311ce7
-server:
-  http2:
-    enabled: true
+name: DOCKER-CD
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-22.04
+    env:
+      working-directory: .
+
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: application.yml 생성
+        run: |
+          mkdir -p ./src/main/resources && cd $_
+          touch ./application.yml
+          echo "${{ secrets.CD_DEV_APPLICATION }}" > ./application.yml
+          cat ./application.yml
+        working-directory: ${{ env.working-directory }}
+
+      - name: 빌드
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+        working-directory: ${{ env.working-directory }}
+        shell: bash
+
+
+      - name: docker 로그인
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: login docker hub
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_LOGIN_USERNAME }}
+          password: ${{ secrets.DOCKER_LOGIN_ACCESSTOKEN }}
+
+      - name: docker image 빌드 및 푸시
+        run: |
+          IMAGE_TAG=dev
+          docker build --platform linux/amd64 -t sopt35sopkathon/planking:$IMAGE_TAG .
+          docker push sopt35sopkathon/planking:$IMAGE_TAG
+        working-directory: ${{ env.working-directory }}
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: docker 컨테이너 실행
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP_DEV }}
+          username: ${{ secrets.SERVER_USER_DEV }}
+          key: ${{ secrets.SERVER_KEY_DEV }}
+          script: |
+            cd ~
+            ./deploy.sh
