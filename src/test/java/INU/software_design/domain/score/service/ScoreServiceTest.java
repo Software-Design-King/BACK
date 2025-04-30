@@ -1,8 +1,7 @@
 package INU.software_design.domain.score.service;
 
-import INU.software_design.common.enums.Gender;
 import INU.software_design.common.enums.Subject;
-import INU.software_design.common.testutil.TestStudentFactory;
+import INU.software_design.common.testutil.TestFactory;
 import INU.software_design.domain.score.dto.ScoreDetailRes;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
 import INU.software_design.domain.score.dto.response.StudentScoreResponse;
@@ -20,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +54,7 @@ class ScoreServiceTest {
     void setUp() {
         reset(studentRepository, scoreRepository);
 
-        student = TestStudentFactory.createWithId(1L);
+        student = TestFactory.createWithId(1L);
 
         score1 = Score.create(student, Subject.MATH, 90, 1);
         score2 = Score.create(student, Subject.SCIENCE, 80, 2);
