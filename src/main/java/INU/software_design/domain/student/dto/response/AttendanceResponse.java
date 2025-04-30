@@ -29,7 +29,7 @@ public class AttendanceResponse {
     public static AttendanceResponse of(Attendance attendance) {
         return AttendanceResponse.builder()
                 .type(attendance.getType())
-                .date(attendance.getReason())
+                .date(attendance.getDate().toString())
                 .title(attendance.getTitle())
                 .reason(attendance.getReason())
                 .build();

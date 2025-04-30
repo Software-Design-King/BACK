@@ -51,11 +51,22 @@ public class ScoreService {
     }
 
 
+//    private int getRank(Long studentId, List<Object[]> scoreList) {
+//        List<Long> sortedStudentIds = scoreList.stream()
+//                .sorted((a, b) -> Long.compare((Long) b[1], (Long) a[1])) // 총점 기준 내림차순 정렬
+//                .map(e -> (Long) e[0])
+//                .toList();
+//        return sortedStudentIds.indexOf(studentId) + 1;
+//    }
     private int getRank(Long studentId, List<Object[]> scoreList) {
         List<Long> sortedStudentIds = scoreList.stream()
-                .sorted((a, b) -> Long.compare((Long) b[1], (Long) a[1])) // 총점 기준 내림차순 정렬
-                .map(e -> (Long) e[0])
+                .sorted((a, b) -> Long.compare(
+                        ((Number) b[1]).longValue(),
+                        ((Number) a[1]).longValue())
+                ) // 총점 기준 내림차순 정렬
+                .map(e -> ((Number) e[0]).longValue())
                 .toList();
+
         return sortedStudentIds.indexOf(studentId) + 1;
     }
 

@@ -37,6 +37,10 @@ public class Score {
         return new Score(student, subject, request.getScore(), semester);
     }
 
+    public static Score create(Student student, Subject subject, int score, Integer semester) {
+        return new Score(student, subject, score, semester);
+    }
+
     public void updateScore(int score) {
         this.score = score;
     }

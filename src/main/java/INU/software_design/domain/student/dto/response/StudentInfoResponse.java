@@ -12,6 +12,8 @@ public class StudentInfoResponse {
 
     private String name;
 
+    private Integer age;
+
     private String birthDate;
 
     private Gender gender;
@@ -29,10 +31,11 @@ public class StudentInfoResponse {
     private int studentNum;
 
     @Builder
-    private StudentInfoResponse(String name, String birthDate, Gender gender, String address,
+    private StudentInfoResponse(String name, Integer age, String birthDate, Gender gender, String address,
                                String contact, String entranceDate,
                                int grade, int classNum, int studentNum) {
         this.name = name;
+        this.age = age;
         this.birthDate = birthDate;
         this.gender = gender;
         this.address = address;
@@ -46,6 +49,7 @@ public class StudentInfoResponse {
     public static StudentInfoResponse of(Student student, Integer classNum) {
         return StudentInfoResponse.builder()
                 .name(student.getName())
+                .age(student.getAge())
                 .birthDate(student.getBirthDate().toString())
                 .gender(student.getGender())
                 .address(student.getAddress())
