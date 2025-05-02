@@ -47,8 +47,9 @@ jobs:
 
       - name: docker image 빌드 및 푸시
         run: |
-          docker build --platform linux/amd64 -t sopt35sopkathon/planking .
-          docker push sopt35sopkathon/planking
+          IMAGE_TAG=main
+          docker build --platform linux/amd64 -t sopt35sopkathon/planking:$IMAGE_TAG .
+          docker push sopt35sopkathon/planking:$IMAGE_TAG
         working-directory: ${{ env.working-directory }}
 
   cd:
