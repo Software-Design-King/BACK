@@ -1,6 +1,7 @@
 package INU.software_design.domain.Class;
 
 import INU.software_design.domain.Class.entity.Class;
+import INU.software_design.domain.student.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,7 +22,7 @@ public interface ClassRepository extends JpaRepository<Class, Long> {
     @Query("SELECT c FROM Class c WHERE c.teacherId = :teacherId")
     Optional<Class> findByTeacherId(Long teacherId);
 
-    @Query("SELECT c.teacherId FROM Class c WHERE c.id = :classId")
-    Long findTeacherIdById(Long classId);
+    @Query("SELECT c.teacherId FROM Class c WHERE c.id = :#{#student.classId}")
+    Long findTeacherIdByStudent(Student student);
 
 }
