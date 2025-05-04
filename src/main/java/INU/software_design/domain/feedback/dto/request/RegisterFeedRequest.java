@@ -1,5 +1,6 @@
-package INU.software_design.domain.feedback.dto;
+package INU.software_design.domain.feedback.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,11 @@ public class RegisterFeedRequest {
 
     private String attitudeFeed;
 
-    private String OthersFeed;
+    private String othersFeed;
 
-    private boolean isPublic;
+    @JsonProperty("isSharedWithStudent")
+    private boolean isSharedWithStudent;
+
+    @JsonProperty("isSharedWithParent")
+    private boolean isSharedWithParent;
 }
