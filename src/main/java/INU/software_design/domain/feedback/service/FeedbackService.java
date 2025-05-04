@@ -1,5 +1,7 @@
 package INU.software_design.domain.feedback.service;
 
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.feedback.dto.request.RegisterFeedRequest;
 import INU.software_design.domain.feedback.dto.response.FeedbackInfoResponse;
@@ -29,7 +31,7 @@ public class FeedbackService {
     @Transactional
     public void registerFeedback(Long studentId, RegisterFeedRequest request) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
         Long teacherId = classRepository.findTeacherIdByStudent(student);
         Feedback feedback = Feedback.create(student, teacherId, request);
         feedbackRepository.save(feedback);
