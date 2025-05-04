@@ -1,5 +1,7 @@
 package INU.software_design.domain.counsel.service;
 
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.counsel.dto.request.RegisterCounselRequest;
 import INU.software_design.domain.counsel.dto.response.CounselInfoResponse;
@@ -30,7 +32,7 @@ public class CounselService {
     @Transactional
     public void registerCounsel(Long studentId, RegisterCounselRequest request) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
         Long teacherId = classRepository.findTeacherIdByStudent(student);
         Counsel counsel = Counsel.create(student, teacherId, request);
         counselRepository.save(counsel);

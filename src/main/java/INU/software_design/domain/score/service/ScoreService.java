@@ -1,5 +1,7 @@
 package INU.software_design.domain.score.service;
 
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.score.repository.ScoreRepository;
 import INU.software_design.domain.score.entity.Score;
 import INU.software_design.domain.score.entity.SubjectScore;
@@ -117,7 +119,7 @@ public class ScoreService {
             Score Score = StudentScores.stream()
                     .filter(score -> score.getSubject().equals(subjectScore.getName()))
                     .findFirst()
-                    .orElseThrow(() -> new EntityNotFoundException("해당 과목의 성적을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
             Score.updateScore(subjectScore.getScore());
         }
     }
@@ -131,7 +133,7 @@ public class ScoreService {
 
     private List<Score> getScoreList(Long studentId, Integer semester) {
         if (scoreRepository.findAllByStudentIdAndSemester(studentId, semester).isEmpty()) {
-            throw new EntityNotFoundException("해당 학생의 성적을 찾을 수 없습니다.");
+            throw new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY);
         } else {
             return scoreRepository.findAllByStudentIdAndSemester(studentId, semester);
         }
@@ -152,7 +154,7 @@ public class ScoreService {
     private void saveStudentScores(StudentScoreRequest request, Student student, Integer semester) {
         for (SubjectScore subjectScore : request.getSubjects()) {
             if (isEnrolled(student, subjectScore)) {
-                throw new IllegalArgumentException("이미 등록된 과목입니다.");
+                throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
             }
             Score score = Score.create(student, subjectScore.getName(), subjectScore, semester);
             scoreRepository.save(score);
@@ -164,6 +166,6 @@ public class ScoreService {
     }
 
     private Student findStudentBy(Long studentId) {
-        return studentRepository.findById(studentId).orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
+        return studentRepository.findById(studentId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 }

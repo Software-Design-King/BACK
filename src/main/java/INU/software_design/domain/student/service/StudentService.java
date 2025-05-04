@@ -1,5 +1,7 @@
 package INU.software_design.domain.student.service;
 
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
@@ -69,7 +71,7 @@ public class StudentService {
 
     private Attendance findAttendanceBy(Long studentId, AttendanceRequest request) {
         return attendanceRepository.findByStudentIdAndDate(studentId, request.getDate())
-                .orElseThrow(() -> new EntityNotFoundException("해당 출석 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 
     private int findClassNumberBy(Student student) {
@@ -78,12 +80,12 @@ public class StudentService {
 
     private Student findById(Long studentId) {
         return studentRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 
     private List<Student> findAllStudentBy(Long classId) {
         return studentRepository.findAllByClassId(classId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학생을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 
     private static List<StudentInfo> transToStudentInfoList(List<Student> studentList) {
