@@ -1,6 +1,7 @@
 package INU.software_design.domain.student.entity;
 
 import INU.software_design.common.enums.Gender;
+import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -68,5 +69,18 @@ public class Student {
         this.birthDate = request.getBirthDate();
         this.contact = request.getContact();
         this.parentContact = request.getParentContact();
+    }
+
+    public void update(EnrollStudentTeacherReq request, String socialId) {
+        this.name = request.userName();
+        this.age = request.age();
+        this.grade = request.grade();
+        this.address = request.address();
+        this.socialId = socialId;
+        this.number = request.number();
+        this.gender = request.gender();
+        this.birthDate = request.birthDate();
+        this.contact = request.contact();
+        this.parentContact = request.parentContact();
     }
 }
