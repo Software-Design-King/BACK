@@ -1,6 +1,8 @@
 package INU.software_design.domain.score.service;
 
 import INU.software_design.common.enums.Subject;
+import INU.software_design.common.exception.SwPlanException;
+import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.testutil.TestFactory;
 import INU.software_design.domain.score.dto.ScoreDetailRes;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -138,10 +139,27 @@ class ScoreServiceTest {
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         // when & then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+        SwPlanUseException exception = assertThrows(SwPlanUseException.class,
                 () -> scoreService.registerStudentScore(studentId, scoreRequest));
 
-        assertEquals("해당 학생을 찾을 수 없습니다.", exception.getMessage());
+        assertNull(exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("학생 성적 등록 실패 테스트 - 이미 등록된 성적")
+    void registerStudentScore_Fail_scoreIsEnrolled() {
+        // given
+        Long studentId = 1L;
+        int semester = 1;
+
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(scoreRepository.existsByStudentIdAndSubject(1L, Subject.MATH)).thenReturn(true);
+
+        // when & then
+        SwPlanUseException exception = assertThrows(SwPlanUseException.class,
+                () -> scoreService.registerStudentScore(studentId, scoreRequest));
+
+        assertNull(exception.getMessage());
     }
     @Test
     @DisplayName("학생 성적 업데이트 테스트")
@@ -195,10 +213,10 @@ class ScoreServiceTest {
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         // when & then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+        SwPlanUseException exception = assertThrows(SwPlanUseException.class,
                 () -> scoreService.updateStudentScore(studentId, updateRequest));
 
-        assertEquals("해당 학생을 찾을 수 없습니다.", exception.getMessage(), "Exception message should indicate student not found");
+        assertNull(exception.getMessage());
     }
 
     @Test
@@ -221,9 +239,59 @@ class ScoreServiceTest {
         when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(existingScores);
 
         // when & then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+        SwPlanUseException exception = assertThrows(SwPlanUseException.class,
                 () -> scoreService.updateStudentScore(studentId, updateRequest));
 
-        assertEquals("해당 과목의 성적을 찾을 수 없습니다.", exception.getMessage(), "Exception message should indicate subject not found");
+        assertNull(exception.getMessage());
+    }
+    @Test
+    @DisplayName("학생 성적 삭제 성공 테스트")
+    void deleteStudentScore_Success() {
+        // given
+        Long studentId = 1L;
+        Integer semester = 1;
+
+        List<Score> existingScores = List.of(score1, score2, score3);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(existingScores);
+
+        // when
+        assertDoesNotThrow(() -> scoreService.deleteStudentScore(studentId, semester));
+
+        // then
+    }
+
+    @Test
+    @DisplayName("학생 성적 삭제 실패 테스트 - 학생 조회 실패")
+    void deleteStudentScore_Fail_StudentNotFound() {
+        // given
+        Long studentId = 1L;
+        Integer semester = 1;
+
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
+
+        // when & then
+        SwPlanException exception = assertThrows(SwPlanException.class,
+                () -> scoreService.deleteStudentScore(studentId, semester),
+                "Exception should be thrown when student is not found");
+
+        assertNull(exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("학생 성적 삭제 실패 테스트 - 학기별 성적 없음")
+    void deleteStudentScore_Fail_NoScoresForSemester() {
+        // given
+        Long studentId = 1L;
+        Integer semester = 1;
+
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(List.of());
+
+        // when & then
+        SwPlanException exception = assertThrows(SwPlanException.class,
+                () -> scoreService.deleteStudentScore(studentId, semester));
+
+        assertNull(exception.getMessage());
     }
 }
