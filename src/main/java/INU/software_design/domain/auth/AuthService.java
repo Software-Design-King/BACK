@@ -99,20 +99,37 @@ public class AuthService {
             Class findclass = classRepository.findByGradeAndClassNumber(enrollStudentTeacherReq.grade(), enrollStudentTeacherReq.classNum()).orElseThrow(
                     () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
             );
-            Student newStudent = Student.create(
-                    findclass.getId(),
+
+            Optional<Student> student = studentRepository.findByNameAndGradeAndClassIdAndNumber(
                     enrollStudentTeacherReq.userName(),
-                    enrollStudentTeacherReq.age(),
                     enrollStudentTeacherReq.grade(),
-                    enrollStudentTeacherReq.address(),
-                    enrollStudentTeacherReq.number(),
-                    socialId,
-                    enrollStudentTeacherReq.gender(),
-                    enrollStudentTeacherReq.birthDate(),
-                    enrollStudentTeacherReq.contact(),
-                    enrollStudentTeacherReq.parentContact()
+                    findclass.getId(),
+                    enrollStudentTeacherReq.number()
             );
-            Student savedStudent = studentRepository.save(newStudent);
+
+            Student savedStudent;
+            // 교사가 등록한 경우
+            if (student.isPresent()) {
+                Student existingStudent = student.get();
+                existingStudent.update(enrollStudentTeacherReq, socialId);
+                savedStudent = studentRepository.save(existingStudent);
+            } else {
+                // 존재하지 않는 경우
+                Student newStudent = Student.create(
+                        findclass.getId(),
+                        enrollStudentTeacherReq.userName(),
+                        enrollStudentTeacherReq.age(),
+                        enrollStudentTeacherReq.grade(),
+                        enrollStudentTeacherReq.address(),
+                        enrollStudentTeacherReq.number(),
+                        socialId,
+                        enrollStudentTeacherReq.gender(),
+                        enrollStudentTeacherReq.birthDate(),
+                        enrollStudentTeacherReq.contact(),
+                        enrollStudentTeacherReq.parentContact()
+                );
+                savedStudent = studentRepository.save(newStudent);
+            }
 
             Token token = getJwtToken(savedStudent.getId(), UserType.STUDENT);
             return EnrollStudentTeacherRes.of(savedStudent.getId(), token.getAccessToken(), token.getRefreshToken());

@@ -1,11 +1,15 @@
 package INU.software_design.domain.student.service;
 
+import INU.software_design.common.enums.UserType;
 import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
+import INU.software_design.domain.Class.entity.Class;
 import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
+import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.student.dto.request.AttendanceRequest;
+import INU.software_design.domain.student.dto.request.EnrollStudentsRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
 import INU.software_design.domain.student.dto.response.AttendanceResponse;
 import INU.software_design.domain.student.dto.response.StudentInfoResponse;
@@ -13,7 +17,6 @@ import INU.software_design.domain.student.dto.response.StudentListResponse;
 import INU.software_design.domain.student.entity.Student;
 import INU.software_design.domain.student.entity.StudentInfo;
 import INU.software_design.domain.student.repository.StudentRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +72,32 @@ public class StudentService {
         return AttendanceResponse.of(attendance);
     }
 
+    @Transactional
+    public void enrollStudents(Long teacherId, EnrollStudentsRequest request) {
+        Class clazz = classRepository.findByTeacherId(teacherId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+
+        List<EnrollStudentTeacherReq> students = request.getStudents();
+        students.forEach(student -> {
+            if (isDifferentClass(student, clazz) && isNotStudent(student)) {
+                throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
+            }
+            Student newStudent = Student.create(
+                    clazz.getId(),
+                    student.userName(),
+                    student.age(),
+                    student.grade(),
+                    student.address(),
+                    student.number(),
+                    null,
+                    student.gender(),
+                    student.birthDate(),
+                    student.contact(),
+                    student.parentContact()
+            );
+            studentRepository.save(newStudent);
+        });
+    }
+
     private Attendance findAttendanceBy(Long studentId, AttendanceRequest request) {
         return attendanceRepository.findByStudentIdAndDate(studentId, request.getDate())
                 .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
@@ -92,5 +121,13 @@ public class StudentService {
         return studentList.stream()
                 .map(StudentInfo::create)
                 .toList();
+    }
+
+    private static boolean isNotStudent(EnrollStudentTeacherReq student) {
+        return student.userType() != UserType.STUDENT;
+    }
+
+    private static boolean isDifferentClass(EnrollStudentTeacherReq student, Class clazz) {
+        return student.classNum() != clazz.getClassNumber();
     }
 }
