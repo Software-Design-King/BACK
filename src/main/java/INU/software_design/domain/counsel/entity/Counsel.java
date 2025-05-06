@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Builder
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Counsel {
 

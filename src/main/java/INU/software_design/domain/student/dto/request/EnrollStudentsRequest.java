@@ -10,4 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 public class EnrollStudentsRequest {
     List<EnrollStudentTeacherReq> students;
+
+    private EnrollStudentsRequest(List<EnrollStudentTeacherReq> students) {
+        this.students = students;
+    }
+
+    public static EnrollStudentsRequest create(List<EnrollStudentTeacherReq> students) {
+        return new EnrollStudentsRequest(students);
+    }
 }

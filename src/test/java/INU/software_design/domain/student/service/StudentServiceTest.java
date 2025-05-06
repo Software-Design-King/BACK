@@ -2,16 +2,22 @@ package INU.software_design.domain.student.service;
 
 import INU.software_design.common.enums.AttendanceType;
 import INU.software_design.common.enums.Gender;
+import INU.software_design.common.enums.UserType;
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
+import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.student.dto.request.AttendanceRequest;
+import INU.software_design.domain.student.dto.request.EnrollStudentsRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
 import INU.software_design.domain.student.dto.response.AttendanceResponse;
 import INU.software_design.domain.student.dto.response.StudentInfoResponse;
 import INU.software_design.domain.student.dto.response.StudentListResponse;
 import INU.software_design.domain.student.entity.Student;
 import INU.software_design.domain.student.repository.StudentRepository;
+import INU.software_design.domain.Class.entity.Class;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +54,10 @@ class StudentServiceTest {
 
     private Attendance attendance;
 
+    EnrollStudentTeacherReq enrollStudentTeacherReq1;
+
+    EnrollStudentTeacherReq enrollStudentTeacherReq2;
+
     @BeforeEach
     void setUp() {
         // 레포지토리 초기화
@@ -63,6 +74,12 @@ class StudentServiceTest {
 
         attendance = Attendance.create(1L, AttendanceType.ABSENT,
                 LocalDateTime.of(2025, 4, 24, 0, 0), "감기로 인한 결석", "감기");
+
+        enrollStudentTeacherReq1 = new EnrollStudentTeacherReq("김철수", 1, 3, 10, UserType.STUDENT, 15, "kakaoToken", "서울", Gender.MALE,
+                LocalDate.of(2008, 6, 10), "010-1111-1111", "010-2222-2222");
+
+        enrollStudentTeacherReq2 = new EnrollStudentTeacherReq("김하나", 1, 3, 11, UserType.STUDENT, 15, "kakaoToken2", "서울", Gender.FEMALE,
+                LocalDate.of(2008, 6, 10), "010-1111-1111", "010-2222-2222");
     }
 
     @Test
@@ -199,5 +216,68 @@ class StudentServiceTest {
 
         verify(attendanceRepository).findByStudentIdAndDate(studentId, date);
         verify(attendanceRepository, times(1)).findByStudentIdAndDate(studentId, date);
+    }
+
+    @Test
+    @DisplayName("학생 등록 성공 테스트")
+    void enrollStudents_Success() {
+        // Given
+        Long teacherId = 1L;
+        Class clazz = mock(Class.class);
+
+        EnrollStudentsRequest request = EnrollStudentsRequest.create(List.of(enrollStudentTeacherReq1, enrollStudentTeacherReq2));
+
+        when(classRepository.findByTeacherId(teacherId)).thenReturn(Optional.of(clazz));
+        when(clazz.getId()).thenReturn(1L);
+        when(clazz.getClassNumber()).thenReturn(3);
+
+        // When
+        studentService.enrollStudents(teacherId, request);
+
+        // Then
+        verify(studentRepository, times(2)).save(any(Student.class));
+    }
+
+    @Test
+    @DisplayName("학생 등록 실패 테스트 - 클래스 불일치")
+    void enrollStudents_Failure() {
+        // Given
+        Long teacherId = 1L;
+        Class clazz = mock(Class.class);
+        EnrollStudentsRequest request = EnrollStudentsRequest.create(List.of(
+                new EnrollStudentTeacherReq("김철수", 1, 3, 10, UserType.STUDENT, 15, "kakaoToken", "서울", Gender.MALE,
+                        LocalDate.of(2008, 6, 10), "010-1111-1111", "010-2222-2222")
+        ));
+
+        when(classRepository.findByTeacherId(teacherId)).thenReturn(Optional.of(clazz));
+        when(clazz.getClassNumber()).thenReturn(10);
+
+        // When
+        Throwable exception = catchThrowable(() -> studentService.enrollStudents(teacherId, request));
+
+        // Then
+        assertThat(exception)
+                .isInstanceOf(SwPlanUseException.class);
+        verify(studentRepository, never()).save(any(Student.class));
+    }
+
+    @Test
+    @DisplayName("학생 등록 실패 테스트 - 학생이 아님")
+    void enrollStudents_Failure_isNotStudent() {
+        // Given
+        Long teacherId = 1L;
+        Class clazz = mock(Class.class);
+        EnrollStudentsRequest request = EnrollStudentsRequest.create(List.of(
+                new EnrollStudentTeacherReq("김철수", 1, 3, 10, UserType.TEACHER, 15, "kakaoToken", "서울", Gender.MALE,
+                        LocalDate.of(2008, 6, 10), "010-1111-1111", "010-2222-2222")
+        ));
+
+        // When
+        Throwable exception = catchThrowable(() -> studentService.enrollStudents(teacherId, request));
+
+        // Then
+        assertThat(exception)
+                .isInstanceOf(SwPlanUseException.class);
+        verify(studentRepository, never()).save(any(Student.class));
     }
 }
