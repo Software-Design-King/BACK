@@ -78,7 +78,7 @@ public class StudentService {
 
         List<EnrollStudentTeacherReq> students = request.getStudents();
         students.forEach(student -> {
-            if (isDifferentClass(student, clazz) && isNotStudent(student)) {
+            if (isDifferentClass(student, clazz) || isNotStudent(student)) {
                 throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
             }
             Student newStudent = Student.create(
