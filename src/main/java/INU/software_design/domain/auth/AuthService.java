@@ -75,12 +75,12 @@ public class AuthService {
             );
         } else if (user instanceof Teacher) {
             Token token = getJwtToken(((Teacher) user).getId(), UserType.TEACHER);
-            Class teacherClass = classRepository.findById(((Teacher) user).getId()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY)
+            Class teacherClass = classRepository.findByTeacherId(((Teacher) user).getId()).orElseThrow(
+                    () -> new SwPlanUseException(ErrorBaseCode.CONFLICT)
             );
             return LoginSuccessRes.create(
                     ((Teacher) user).getName(),
-                    UserType.PARENT,
+                    UserType.TEACHER,
                     teacherClass.getGrade(),
                     teacherClass.getClassNumber(),
                     token.getAccessToken(),
