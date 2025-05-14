@@ -10,6 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 public class RegisterCounselRequest {
 
+    private String title;
+
     private String context;
 
     private String plan;

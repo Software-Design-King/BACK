@@ -12,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CounselInfoResponse {
 
+    private String title;
+
     private int grade;
 
     private LocalDateTime createdAt;
@@ -24,7 +26,8 @@ public class CounselInfoResponse {
 
     private boolean isShared;
 
-    private CounselInfoResponse(int grade, LocalDateTime createdAt, String context, String plan, List<String> tags, boolean isShared) {
+    private CounselInfoResponse(String title, int grade, LocalDateTime createdAt, String context, String plan, List<String> tags, boolean isShared) {
+        this.title = title;
         this.grade = grade;
         this.createdAt = createdAt;
         this.context = context;
@@ -35,6 +38,7 @@ public class CounselInfoResponse {
 
     public static CounselInfoResponse create(Counsel counsel) {
         return new CounselInfoResponse(
+                counsel.getTitle(),
                 counsel.getGrade(),
                 counsel.getCreatedAt(),
                 counsel.getContent(),
