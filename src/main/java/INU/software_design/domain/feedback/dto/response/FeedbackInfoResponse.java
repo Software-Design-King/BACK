@@ -15,6 +15,8 @@ public class FeedbackInfoResponse {
 
     private LocalDateTime createdAt;
 
+    private String title;
+
     private String scoreFeed;
 
     private String behaviorFeed;
@@ -29,9 +31,10 @@ public class FeedbackInfoResponse {
 
     private boolean isSharedWithParent;
 
-    private FeedbackInfoResponse(int grade, LocalDateTime createdAt, String scoreFeed, String behaviorFeed, String attendanceFeed, String attitudeFeed, String othersFeed, boolean isSharedWithStudent, boolean isSharedWithParent) {
+    private FeedbackInfoResponse(int grade, LocalDateTime createdAt, String title, String scoreFeed, String behaviorFeed, String attendanceFeed, String attitudeFeed, String othersFeed, boolean isSharedWithStudent, boolean isSharedWithParent) {
         this.grade = grade;
         this.createdAt = createdAt;
+        this.title = title;
         this.scoreFeed = scoreFeed;
         this.behaviorFeed = behaviorFeed;
         this.attendanceFeed = attendanceFeed;
@@ -45,6 +48,7 @@ public class FeedbackInfoResponse {
         return new FeedbackInfoResponse(
                 feedback.getGrade(),
                 feedback.getCreatedAt(),
+                feedback.getTitle(),
                 feedback.getScore(),
                 feedback.getBehavior(),
                 feedback.getAttendance(),

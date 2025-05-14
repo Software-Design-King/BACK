@@ -62,6 +62,7 @@ class FeedbackServiceTest {
 
         feedback1 = Feedback.create(
                 1L, 1L, 3,
+                "예시 피드백1",
                 "성적 피드백",
                 "행동 피드백",
                 "출석 피드백",
@@ -73,6 +74,7 @@ class FeedbackServiceTest {
 
         feedback2 = Feedback.create(
                 1L, 2L, 3,
+                "예시 피드백2",
                 "성적 피드백",
                 "행동 피드백",
                 "출석 피드백",

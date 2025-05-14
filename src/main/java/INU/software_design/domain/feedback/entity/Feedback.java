@@ -27,6 +27,8 @@ public class Feedback {
 
     private int grade;
 
+    private String title;
+
     private String score;
 
     private String behavior;
@@ -44,13 +46,14 @@ public class Feedback {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private Feedback(Long studentId, Long teacherId, int grade,
+    private Feedback(Long studentId, Long teacherId, int grade, String title,
                     String score, String behavior, String attendance,
                      String attitude, String others,
                      Boolean isSharedWithStudent, Boolean isSharedWithParent) {
         this.studentId = studentId;
         this.teacherId = teacherId;
         this.grade = grade;
+        this.title = title;
         this.score = score;
         this.behavior = behavior;
         this.attendance = attendance;
@@ -60,8 +63,8 @@ public class Feedback {
         this.isSharedWithParent = isSharedWithParent;
     }
 
-    public static Feedback create(Long studentId, Long teacherId, int grade, String score, String behavior, String attendance, String attitude, String others, Boolean isSharedWithStudent, Boolean isSharedWithParent) {
-        return new Feedback(studentId, teacherId, grade, score, behavior, attendance, attitude, others, isSharedWithStudent, isSharedWithParent);
+    public static Feedback create(Long studentId, Long teacherId, int grade, String title, String score, String behavior, String attendance, String attitude, String others, Boolean isSharedWithStudent, Boolean isSharedWithParent) {
+        return new Feedback(studentId, teacherId, grade, title, score, behavior, attendance, attitude, others, isSharedWithStudent, isSharedWithParent);
     }
 
     public static Feedback create(Student student, Long teacherId, RegisterFeedRequest request){
@@ -69,6 +72,7 @@ public class Feedback {
                 student.getId(),
                 teacherId,
                 student.getGrade(),
+                request.getTitle(),
                 request.getScoreFeed(),
                 request.getBehaviorFeed(),
                 request.getAttendanceFeed(),
