@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterFeedRequest {
 
+    private String title;
+
     private String scoreFeed;
 
     private String behaviorFeed;

@@ -25,6 +25,8 @@ public class Counsel {
 
     private int grade;
 
+    private String title;
+
     private String content;
 
     private String plan;
@@ -38,21 +40,22 @@ public class Counsel {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private Counsel(Long studentId, Long teacherId, int grade, String content, String plan, List<String> tags, boolean isShared) {
+    private Counsel(Long studentId, Long teacherId, int grade, String title, String content, String plan, List<String> tags, boolean isShared) {
         this.studentId = studentId;
         this.teacherId = teacherId;
         this.grade = grade;
+        this.title = title;
         this.content = content;
         this.plan = plan;
         this.tags = tags;
         this.isShared = isShared;
     }
 
-    public static Counsel create(Long studentId, Long teacherId, int grade, String content, String plan, List<String> tags, boolean isShared) {
-        return new Counsel(studentId, teacherId, grade, content, plan, tags, isShared);
+    public static Counsel create(Long studentId, Long teacherId, int grade, String title, String content, String plan, List<String> tags, boolean isShared) {
+        return new Counsel(studentId, teacherId, grade, title, content, plan, tags, isShared);
     }
 
     public static Counsel create(Student student, Long teacherId, RegisterCounselRequest request) {
-        return new Counsel(student.getId(), teacherId, student.getGrade(), request.getContext(), request.getPlan(), request.getTags(), request.isShared());
+        return new Counsel(student.getId(), teacherId, student.getGrade(),  request.getTitle(), request.getContext(), request.getPlan(), request.getTags(), request.isShared());
     }
 }
