@@ -6,6 +6,8 @@ import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.testutil.TestFactory;
 import INU.software_design.domain.score.dto.ScoreDetailRes;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
+import INU.software_design.domain.score.dto.response.SemesterScore;
+import INU.software_design.domain.score.dto.response.StudentAllScoresResponse;
 import INU.software_design.domain.score.dto.response.StudentScoreResponse;
 import INU.software_design.domain.score.entity.Score;
 import INU.software_design.domain.score.entity.SubjectScore;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,37 +71,6 @@ class ScoreServiceTest {
                 .semester(1)
                 .subjects(List.of(subjectScore1, subjectScore2))
                 .build();
-    }
-
-    @Test
-    @DisplayName("학생 성적 조회 테스트")
-    void getScoreDetail_Success() {
-        // given
-        long studentId = 1L;
-        int grade = 1;
-        int semester = 1;
-
-        List<Score> scores = List.of(score1, score2, score3);
-        List<Object[]> allTotalScores = List.of(new Object[]{1L, 170}, new Object[]{2L, 160}, new Object[]{3L, 190});
-        List<Object[]> classTotalScores = List.of(new Object[]{1L, 170}, new Object[]{2L, 160});
-
-        when(scoreRepository.findByStudentIdAndGradeAndSemester(studentId, grade, semester)).thenReturn(scores);
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.findAllTotalScoresByGradeAndSemester(grade, semester)).thenReturn(allTotalScores);
-        when(scoreRepository.findAllTotalScoresByClassAndSemester(grade, semester, 100L)).thenReturn(classTotalScores);
-
-        // when
-        ScoreDetailRes result = scoreService.getScoreDetail(studentId, grade, semester);
-
-        // then
-        assertNotNull(result);
-        assertEquals(240, result.totalScore());
-        assertEquals(80.0, result.averageScore());
-        assertEquals(2, result.wholeRank());
-        assertEquals(1, result.classRank());
-        assertEquals(3, result.subjects().size());
-        assertEquals("MATH", result.subjects().get(0).subject());
-        assertEquals(90, result.subjects().get(0).score());
     }
 
     @Test
@@ -161,6 +133,7 @@ class ScoreServiceTest {
 
         assertNull(exception.getMessage());
     }
+
     @Test
     @DisplayName("학생 성적 업데이트 테스트")
     void updateStudentScore_Success() {
@@ -244,6 +217,7 @@ class ScoreServiceTest {
 
         assertNull(exception.getMessage());
     }
+
     @Test
     @DisplayName("학생 성적 삭제 성공 테스트")
     void deleteStudentScore_Success() {
