@@ -15,15 +15,12 @@ public class ScoreController {
     private final ScoreService scoreService;
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<BaseResponse<?>> getScore(
-            @PathVariable Long studentId,
-            @RequestParam("grade") int grade,
-            @RequestParam("semester") int semester
-            )
+    public ResponseEntity<BaseResponse<?>> getScore(@PathVariable Long studentId)
     {
         return ApiResponseUtil.success(
                 SuccessCode.OK,
-                scoreService.getScoreDetail(studentId, grade, semester)
+                scoreService.getScore(studentId)
         );
     }
+
 }
