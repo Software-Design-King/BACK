@@ -14,7 +14,7 @@ import INU.software_design.domain.score.dto.response.StudentAllScoresResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import INU.software_design.domain.score.dto.ScoreDetailRes;
+import INU.software_design.domain.score.dto.response.ScoreDetailRes;
 
 
 import java.util.List;
