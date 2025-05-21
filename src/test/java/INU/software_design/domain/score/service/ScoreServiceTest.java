@@ -1,10 +1,11 @@
 package INU.software_design.domain.score.service;
 
+import INU.software_design.common.enums.ExamType;
 import INU.software_design.common.enums.Subject;
 import INU.software_design.common.exception.SwPlanException;
 import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.testutil.TestFactory;
-import INU.software_design.domain.score.dto.ScoreDetailRes;
+import INU.software_design.domain.score.dto.response.ScoreDetailRes;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
 import INU.software_design.domain.score.dto.response.SemesterScore;
 import INU.software_design.domain.score.dto.response.StudentAllScoresResponse;
@@ -60,9 +61,9 @@ class ScoreServiceTest {
 
         student = TestFactory.createWithId(1L);
 
-        score1 = Score.create(student, Subject.MATH, 90, 1);
-        score2 = Score.create(student, Subject.SCIENCE, 80, 2);
-        score3 = Score.create(student, Subject.ENGLISH, 70, 3);
+        score1 = Score.create(student, Subject.MATH, ExamType.MID, 90, 1);
+        score2 = Score.create(student, Subject.SCIENCE, ExamType.MID,80, 2);
+        score3 = Score.create(student, Subject.ENGLISH, ExamType.MID,70, 3);
 
         subjectScore1 = SubjectScore.create(score1);
         subjectScore2 = SubjectScore.create(score2);
@@ -200,7 +201,7 @@ class ScoreServiceTest {
         Integer semester = 1;
 
         List<Score> existingScores = List.of(score1); // Only one score exists
-        Score nonExistentScore = Score.create(student, Subject.KOREAN, 90, 1);
+        Score nonExistentScore = Score.create(student, Subject.KOREAN, ExamType.MID,90, 1);
         SubjectScore nonExistentSubjectScore = SubjectScore.create(nonExistentScore);
 
         StudentScoreRequest updateRequest = StudentScoreRequest.builder()

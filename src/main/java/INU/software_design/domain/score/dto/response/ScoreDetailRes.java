@@ -1,4 +1,4 @@
-package INU.software_design.domain.score.dto;
+package INU.software_design.domain.score.dto.response;
 
 import java.util.List;
 
