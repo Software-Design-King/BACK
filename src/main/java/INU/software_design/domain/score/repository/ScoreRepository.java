@@ -1,5 +1,6 @@
 package INU.software_design.domain.score.repository;
 
+import INU.software_design.common.enums.ExamType;
 import INU.software_design.common.enums.Subject;
 import INU.software_design.domain.score.entity.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,5 +58,5 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "GROUP BY sc.studentId")
     List<Object[]> findAllTotalScoresByClassAndSemester(@Param("grade") int grade, @Param("semester") int semester, @Param("classId") Long classId);
 
-    boolean existsByStudentIdAndSubject(Long studentId, Subject subject);
+    boolean existsByStudentIdAndSubjectAndExamType(Long studentId, Subject subject, ExamType examType);
 }

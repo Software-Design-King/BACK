@@ -14,7 +14,6 @@ import INU.software_design.domain.score.dto.response.StudentAllScoresResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import INU.software_design.domain.score.dto.response.ScoreDetailRes;
 
 
 import java.util.List;
@@ -179,6 +178,7 @@ public class ScoreService {
                     .findFirst()
                     .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
             Score.updateScore(subjectScore.getScore());
+            Score.updateExamType(subjectScore.getExamType());
         }
     }
 
@@ -212,7 +212,7 @@ public class ScoreService {
     private void saveStudentScores(StudentScoreRequest request, Student student, Integer semester) {
         for (SubjectScore subjectScore : request.getSubjects()) {
             if (isEnrolled(student, subjectScore)) {
-                throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
+                throw new SwPlanUseException(ErrorBaseCode.CONFLICT);
             }
             Score score = Score.create(student, subjectScore.getName(), subjectScore, semester);
             scoreRepository.save(score);
@@ -220,7 +220,7 @@ public class ScoreService {
     }
 
     private boolean isEnrolled(Student student, SubjectScore subjectScore) {
-        return scoreRepository.existsByStudentIdAndSubject(student.getId(), subjectScore.getName());
+        return scoreRepository.existsByStudentIdAndSubjectAndExamType(student.getId(), subjectScore.getName(), subjectScore.getExamType());
     }
 
     private Student findStudentBy(Long studentId) {

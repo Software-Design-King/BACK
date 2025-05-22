@@ -49,4 +49,8 @@ public class Score {
     public void updateScore(int score) {
         this.score = score;
     }
+
+    public void updateExamType(ExamType examType) {
+        this.examType = examType;
+    }
 }
