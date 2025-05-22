@@ -178,7 +178,6 @@ public class ScoreService {
                     .findFirst()
                     .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
             Score.updateScore(subjectScore.getScore());
-            Score.updateExamType(subjectScore.getExamType());
         }
     }
 
