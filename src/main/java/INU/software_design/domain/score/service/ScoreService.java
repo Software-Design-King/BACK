@@ -30,32 +30,6 @@ public class ScoreService {
 
     private final ScoreRepository scoreRepository;
 
-//	public ScoreDetailRes getScoreDetail(final long studentId, final int grade, final int semester) {
-//
-//        // 1. 점수 가져오기
-//        List<Score> scores = scoreRepository.findByStudentIdAndGradeAndSemester(studentId, grade, semester);
-//
-//        int total = scores.stream().mapToInt(Score::getScore).sum();
-//        double avg = total / (double) scores.size();
-//
-//        List<ScoreDetailRes.SubjectScore> subjectScores = scores.stream()
-//                .map(s -> new ScoreDetailRes.SubjectScore(s.getSubject().name(), s.getScore()))
-//                .toList();
-//
-//        // 2. 학생 정보 가져오기 (반 정보 필요)
-//        Student student = studentRepository.findById(studentId).orElseThrow();
-//
-//        // 3. 전교 석차 계산
-//        List<Object[]> allTotalScores = scoreRepository.findAllTotalScoresByGradeAndSemester(grade, semester);
-//        int wholeRank = getRank(studentId, allTotalScores);
-//
-//        // 4. 반 석차 계산
-//        List<Object[]> classTotalScores = scoreRepository.findAllTotalScoresByClassAndSemester(grade, semester, student.getClassId());
-//        int classRank = getRank(studentId, classTotalScores);
-//
-//        return new ScoreDetailRes(total, avg, wholeRank, classRank, subjectScores);
-//    }
-
     private int getRank(Long studentId, List<Object[]> scoreList) {
         List<Long> sortedStudentIds = scoreList.stream()
                 .sorted((a, b) -> Long.compare(
@@ -141,7 +115,7 @@ public class ScoreService {
                 getTotalScore(studentId, semester),
                 getWholeRankBy(studentId, semester),
                 getClassRankBy(studentId, semester, student),
-                getSubjectScores(studentId, semester)
+                getSubjectScores(studentId, student.getGrade(), semester)
         );
     }
 
@@ -157,7 +131,7 @@ public class ScoreService {
                 getTotalScore(studentId, semester),
                 getWholeRankBy(studentId, semester),
                 getClassRankBy(studentId, semester, student),
-                getSubjectScores(studentId, semester)
+                getSubjectScores(studentId, student.getGrade(), semester)
         );
     }
 
@@ -165,34 +139,36 @@ public class ScoreService {
     @Transactional
     public void deleteStudentScore(Long studentId, Integer semester) {
         Student student = findStudentBy(studentId);
-        List<Score> scores = getScoreList(student.getId(), semester);
+        List<Score> scores = getScoreList(student.getId(), student.getGrade(), semester);
         scoreRepository.deleteAll(scores);
     }
 
     private void updateStudentScores(StudentScoreRequest request, Student student, Integer semester) {
-        List<Score> StudentScores = getScoreList(student.getId(), semester);
+        List<Score> StudentScores = getScoreList(student.getId(), student.getGrade(), semester);
 
         for (SubjectScore subjectScore : request.getSubjects()) {
             Score Score = StudentScores.stream()
                     .filter(score -> score.getSubject().equals(subjectScore.getName()))
+                    .filter(score -> score.getExamType().equals(subjectScore.getExamType()))
                     .findFirst()
                     .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
             Score.updateScore(subjectScore.getScore());
         }
     }
 
-    private List<SubjectScore> getSubjectScores(Long studentId, Integer semester) {
-        List<Score> scoreList = getScoreList(studentId, semester);
+    private List<SubjectScore> getSubjectScores(Long studentId, Integer grade, Integer semester) {
+        List<Score> scoreList = getScoreList(studentId, grade, semester);
         return scoreList.stream()
                 .map(SubjectScore::create)
                 .toList();
     }
 
-    private List<Score> getScoreList(Long studentId, Integer semester) {
-        if (scoreRepository.findAllByStudentIdAndSemester(studentId, semester).isEmpty()) {
+    private List<Score> getScoreList(Long studentId, Integer grade, Integer semester) {
+        List<Score> scores = scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, grade, semester);
+        if (scores.isEmpty()) {
             throw new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY);
         } else {
-            return scoreRepository.findAllByStudentIdAndSemester(studentId, semester);
+            return scores;
         }
     }
 
@@ -210,7 +186,7 @@ public class ScoreService {
 
     private void saveStudentScores(StudentScoreRequest request, Student student, Integer semester) {
         for (SubjectScore subjectScore : request.getSubjects()) {
-            if (isEnrolled(student, subjectScore)) {
+            if (isEnrolled(student, semester, subjectScore)) {
                 throw new SwPlanUseException(ErrorBaseCode.CONFLICT);
             }
             Score score = Score.create(student, subjectScore.getName(), subjectScore, semester);
@@ -218,8 +194,8 @@ public class ScoreService {
         }
     }
 
-    private boolean isEnrolled(Student student, SubjectScore subjectScore) {
-        return scoreRepository.existsByStudentIdAndSubjectAndExamType(student.getId(), subjectScore.getName(), subjectScore.getExamType());
+    private boolean isEnrolled(Student student, int semester, SubjectScore subjectScore) {
+        return scoreRepository.existsByStudentIdAndGradeAndSemesterAndSubjectAndExamType(student.getId(), student.getGrade(), semester, subjectScore.getName(), subjectScore.getExamType());
     }
 
     private Student findStudentBy(Long studentId) {

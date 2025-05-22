@@ -82,13 +82,13 @@ class ScoreServiceTest {
         int semester = 1;
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.existsByStudentIdAndSubject(1L, Subject.MATH)).thenReturn(false);
-        when(scoreRepository.existsByStudentIdAndSubject(1L, Subject.SCIENCE)).thenReturn(false);
+        when(scoreRepository.existsByStudentIdAndGradeAndSemesterAndSubjectAndExamType(1L, 1, 1, Subject.MATH, ExamType.MID)).thenReturn(false);
+        when(scoreRepository.existsByStudentIdAndGradeAndSemesterAndSubjectAndExamType(1L, 1, 1, Subject.SCIENCE, ExamType.MID)).thenReturn(false);
 
         when(scoreRepository.findTotalScoreBy(semester, studentId)).thenReturn(180);
         when(scoreRepository.findWholeRankBy(semester, studentId)).thenReturn(Optional.of(1));
         when(scoreRepository.findClassRankBy(semester, student.getGrade(), studentId)).thenReturn(Optional.of(1));
-        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester))
+        when(scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, 1, semester))
                 .thenReturn(List.of(score1, score2));
 
         // when
@@ -126,7 +126,7 @@ class ScoreServiceTest {
         int semester = 1;
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.existsByStudentIdAndSubject(1L, Subject.MATH)).thenReturn(true);
+        when(scoreRepository.existsByStudentIdAndGradeAndSemesterAndSubjectAndExamType(1L, 1, 1, Subject.MATH, ExamType.MID)).thenReturn(true);
 
         // when & then
         SwPlanUseException exception = assertThrows(SwPlanUseException.class,
@@ -156,7 +156,7 @@ class ScoreServiceTest {
                 .build();
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(existingScores);
+        when(scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, 1, semester)).thenReturn(existingScores);
         when(scoreRepository.findTotalScoreBy(semester, studentId)).thenReturn(130);
         when(scoreRepository.findWholeRankBy(semester, studentId)).thenReturn(Optional.of(1));
         when(scoreRepository.findClassRankBy(semester, student.getGrade(), studentId)).thenReturn(Optional.of(1));
@@ -210,7 +210,7 @@ class ScoreServiceTest {
                 .build();
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(existingScores);
+        when(scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, 1, semester)).thenReturn(existingScores);
 
         // when & then
         SwPlanUseException exception = assertThrows(SwPlanUseException.class,
@@ -228,7 +228,7 @@ class ScoreServiceTest {
 
         List<Score> existingScores = List.of(score1, score2, score3);
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(existingScores);
+        when(scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, 1, semester)).thenReturn(existingScores);
 
         // when
         assertDoesNotThrow(() -> scoreService.deleteStudentScore(studentId, semester));
@@ -261,7 +261,7 @@ class ScoreServiceTest {
         Integer semester = 1;
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(scoreRepository.findAllByStudentIdAndSemester(studentId, semester)).thenReturn(List.of());
+        when(scoreRepository.findAllByStudentIdAndGradeAndSemester(studentId, 1, semester)).thenReturn(List.of());
 
         // when & then
         SwPlanException exception = assertThrows(SwPlanException.class,

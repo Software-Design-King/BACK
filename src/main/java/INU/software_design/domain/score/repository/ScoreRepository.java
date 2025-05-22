@@ -38,7 +38,7 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "WHERE sub.studentId = :studentId AND sub.semester = :semester AND sub.grade = :grade)")
     Optional<Integer> findClassRankBy(Integer semester, Integer grade, Long studentId);
 
-    List<Score> findAllByStudentIdAndSemester(Long studentId, Integer semester);
+    List<Score> findAllByStudentIdAndGradeAndSemester(Long studentId, Integer grade, Integer semester);
 
     List<Score> findAllByStudentId(Long studentId);
 
@@ -58,5 +58,5 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "GROUP BY sc.studentId")
     List<Object[]> findAllTotalScoresByClassAndSemester(@Param("grade") int grade, @Param("semester") int semester, @Param("classId") Long classId);
 
-    boolean existsByStudentIdAndSubjectAndExamType(Long studentId, Subject subject, ExamType examType);
+    boolean existsByStudentIdAndGradeAndSemesterAndSubjectAndExamType(Long studentId, Integer grade, Integer semester, Subject subject, ExamType examType);
 }
