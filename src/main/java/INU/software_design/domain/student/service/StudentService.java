@@ -37,13 +37,12 @@ public class StudentService {
 
         Class clazz = classRepository.findByTeacherId(teacherId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
         Long classId = clazz.getId();
-        int grade = classRepository.findGradeById(classId);
         int classNum = clazz.getClassNumber();
 
         List<Student> studentList = findAllStudentBy(classId);
         List<StudentInfoResponse> students = transToStudentInfoResponse(studentList, classNum);
 
-        return StudentListResponse.create(grade, students);
+        return StudentListResponse.create(clazz, students);
     }
 
     @Transactional
