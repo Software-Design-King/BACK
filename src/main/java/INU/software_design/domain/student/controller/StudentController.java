@@ -22,7 +22,7 @@ public class StudentController {
     private final ScoreService scoreService;
     private final StudentService studentService;
 
-    @GetMapping("/student/list")
+    @GetMapping("/student/list/")
     public ResponseEntity<BaseResponse<?>> getStudentList(
             @UserId Long teacherId
     ) {

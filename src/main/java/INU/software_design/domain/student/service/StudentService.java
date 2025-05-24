@@ -35,11 +35,13 @@ public class StudentService {
     @Transactional
     public StudentListResponse getStudentList(Long teacherId) {
 
-        Long classId = classRepository.findIdByTeacherId(teacherId);
+        Class clazz = classRepository.findByTeacherId(teacherId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
+        Long classId = clazz.getId();
         int grade = classRepository.findGradeById(classId);
+        int classNum = clazz.getClassNumber();
 
         List<Student> studentList = findAllStudentBy(classId);
-        List<StudentInfo> students = transToStudentInfoList(studentList);
+        List<StudentInfoResponse> students = transToStudentInfoResponse(studentList, classNum);
 
         return StudentListResponse.create(grade, students);
     }
@@ -117,9 +119,9 @@ public class StudentService {
                 .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 
-    private static List<StudentInfo> transToStudentInfoList(List<Student> studentList) {
+    private static List<StudentInfoResponse> transToStudentInfoResponse(List<Student> studentList, int classNum) {
         return studentList.stream()
-                .map(StudentInfo::create)
+                .map(student -> StudentInfoResponse.of(student, classNum))
                 .toList();
     }
 
