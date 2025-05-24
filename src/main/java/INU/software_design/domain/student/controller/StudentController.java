@@ -4,6 +4,7 @@ import INU.software_design.common.resolver.UserId;
 import INU.software_design.common.response.ApiResponseUtil;
 import INU.software_design.common.response.BaseResponse;
 import INU.software_design.common.response.code.SuccessCode;
+import INU.software_design.domain.attendance.service.AttendanceService;
 import INU.software_design.domain.score.service.ScoreService;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
 import INU.software_design.domain.student.service.StudentService;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class StudentController {
 
     private final ScoreService scoreService;
     private final StudentService studentService;
+    private final AttendanceService attendanceService;
 
     @GetMapping("/student/list")
     public ResponseEntity<BaseResponse<?>> getStudentList(
@@ -74,7 +78,7 @@ public class StudentController {
             @PathVariable(value = "studentId") Long studentId,
             @Valid @RequestBody AttendanceRequest request
     ) {
-        return ApiResponseUtil.success(SuccessCode.OK, studentService.registerAttendance(studentId, request));
+        return ApiResponseUtil.success(SuccessCode.OK, attendanceService.registerAttendance(studentId, request));
     }
 
     @PatchMapping("/student/attendance/{studentId}")
@@ -82,6 +86,15 @@ public class StudentController {
             @PathVariable(value = "studentId") Long studentId,
             @Valid @RequestBody AttendanceRequest request
     ) {
-        return ApiResponseUtil.success(SuccessCode.OK, studentService.updateAttendance(studentId, request));
+        return ApiResponseUtil.success(SuccessCode.OK, attendanceService.updateAttendance(studentId, request));
+    }
+
+    @DeleteMapping("/student/attendance/{studentId}/{date}")
+    public ResponseEntity<BaseResponse<?>> deleteAttendance(
+            @PathVariable(value = "studentId") Long studentId,
+            @PathVariable(value = "date") LocalDate date
+    ) {
+        attendanceService.deleteAttendance(studentId, date);
+        return ApiResponseUtil.success(SuccessCode.OK);
     }
 }

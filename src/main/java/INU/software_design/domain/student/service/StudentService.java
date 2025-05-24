@@ -5,17 +5,13 @@ import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.Class.entity.Class;
-import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
-import INU.software_design.domain.student.dto.request.AttendanceRequest;
 import INU.software_design.domain.student.dto.request.EnrollStudentsRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
-import INU.software_design.domain.student.dto.response.AttendanceResponse;
 import INU.software_design.domain.student.dto.response.StudentInfoResponse;
 import INU.software_design.domain.student.dto.response.StudentListResponse;
 import INU.software_design.domain.student.entity.Student;
-import INU.software_design.domain.student.entity.StudentInfo;
 import INU.software_design.domain.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,6 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final ClassRepository classRepository;
-    private final AttendanceRepository attendanceRepository;
 
     @Transactional
     public StudentListResponse getStudentList(Long teacherId) {
@@ -60,20 +55,6 @@ public class StudentService {
     }
 
     @Transactional
-    public AttendanceResponse registerAttendance(Long studentId, AttendanceRequest request) {
-        Attendance attendance = Attendance.of(studentId, request);
-        attendanceRepository.save(attendance);
-        return AttendanceResponse.of(attendance);
-    }
-
-    @Transactional
-    public AttendanceResponse updateAttendance(Long studentId, AttendanceRequest request) {
-        Attendance attendance = findAttendanceBy(studentId, request);
-        attendance.update(request);
-        return AttendanceResponse.of(attendance);
-    }
-
-    @Transactional
     public void enrollStudents(Long teacherId, EnrollStudentsRequest request) {
         Class clazz = classRepository.findByTeacherId(teacherId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
 
@@ -97,11 +78,6 @@ public class StudentService {
             );
             studentRepository.save(newStudent);
         });
-    }
-
-    private Attendance findAttendanceBy(Long studentId, AttendanceRequest request) {
-        return attendanceRepository.findByStudentIdAndDate(studentId, request.getDate())
-                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
     }
 
     private int findClassNumberBy(Student student) {
