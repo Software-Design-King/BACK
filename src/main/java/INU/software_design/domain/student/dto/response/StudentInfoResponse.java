@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StudentInfoResponse {
 
+    private Long studentId;
+
     private String name;
 
     private Integer age;
@@ -31,9 +33,10 @@ public class StudentInfoResponse {
     private int studentNum;
 
     @Builder
-    private StudentInfoResponse(String name, Integer age, String birthDate, Gender gender, String address,
+    private StudentInfoResponse(Long studentId, String name, Integer age, String birthDate, Gender gender, String address,
                                String contact, String entranceDate,
                                int grade, int classNum, int studentNum) {
+        this.studentId = studentId;
         this.name = name;
         this.age = age;
         this.birthDate = birthDate;
@@ -48,6 +51,7 @@ public class StudentInfoResponse {
 
     public static StudentInfoResponse of(Student student, Integer classNum) {
         return StudentInfoResponse.builder()
+                .studentId(student.getId())
                 .name(student.getName())
                 .age(student.getAge())
                 .birthDate(student.getBirthDate().toString())

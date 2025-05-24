@@ -6,6 +6,8 @@ import INU.software_design.common.response.code.SuccessCode;
 import INU.software_design.domain.attendance.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AttendanceController {
     private final AttendanceService attendanceService;
 
+    @GetMapping("/{studentId}")
     public ResponseEntity<BaseResponse<?>> getAttendance(
-            Long studentId
+            @PathVariable Long studentId
     ) {
         return ApiResponseUtil.success(
                 SuccessCode.OK,

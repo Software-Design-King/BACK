@@ -12,14 +12,14 @@ public class StudentListResponse {
 
     private int grade;
 
-    private List<StudentInfo> students;
+    private List<StudentInfoResponse> students;
 
-    private StudentListResponse(int grade, List<StudentInfo> students) {
+    private StudentListResponse(int grade, List<StudentInfoResponse> students) {
         this.grade = grade;
         this.students = students;
     }
 
-    public static StudentListResponse create(int grade, List<StudentInfo> students) {
+    public static StudentListResponse create(int grade, List<StudentInfoResponse> students) {
         return new StudentListResponse(grade, students);
     }
 }
