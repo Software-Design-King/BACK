@@ -7,6 +7,7 @@ import INU.software_design.common.response.code.SuccessCode;
 import INU.software_design.domain.attendance.service.AttendanceService;
 import INU.software_design.domain.score.service.ScoreService;
 import INU.software_design.domain.score.dto.request.StudentScoreRequest;
+import INU.software_design.domain.student.service.StudentReportService;
 import INU.software_design.domain.student.service.StudentService;
 import INU.software_design.domain.student.dto.request.AttendanceRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
@@ -25,6 +26,7 @@ public class StudentController {
     private final ScoreService scoreService;
     private final StudentService studentService;
     private final AttendanceService attendanceService;
+    private final StudentReportService studentReportService;
 
     @GetMapping("/student/list")
     public ResponseEntity<BaseResponse<?>> getStudentList(
@@ -96,5 +98,12 @@ public class StudentController {
     ) {
         attendanceService.deleteAttendance(studentId, date);
         return ApiResponseUtil.success(SuccessCode.OK);
+    }
+
+    @GetMapping("/student/report/{studentId}")
+    public ResponseEntity<BaseResponse<?>> studentReport(
+            @PathVariable(value = "studentId") Long studentId
+    ) {
+       return ApiResponseUtil.success(SuccessCode.OK, studentReportService.reportStudent(studentId));
     }
 }
