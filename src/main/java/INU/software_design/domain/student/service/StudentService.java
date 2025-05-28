@@ -5,7 +5,6 @@ import INU.software_design.common.exception.SwPlanUseException;
 import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.Class.ClassRepository;
 import INU.software_design.domain.Class.entity.Class;
-import INU.software_design.domain.attendance.repository.AttendanceRepository;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.student.dto.request.EnrollStudentsRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
