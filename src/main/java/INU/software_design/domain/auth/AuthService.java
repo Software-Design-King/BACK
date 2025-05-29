@@ -96,40 +96,11 @@ public class AuthService {
         final String socialId = getSocialId(enrollStudentTeacherReq.kakaoToken());
 
         if(enrollStudentTeacherReq.userType() == UserType.STUDENT) {
-            Class findclass = classRepository.findByGradeAndClassNumber(enrollStudentTeacherReq.grade(), enrollStudentTeacherReq.classNum()).orElseThrow(
-                    () -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST)
-            );
+            Student student = studentRepository.findByEnrollCode(enrollStudentTeacherReq.enrollCode())
+                    .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
 
-            Optional<Student> student = studentRepository.findByNameAndGradeAndClassIdAndNumber(
-                    enrollStudentTeacherReq.userName(),
-                    enrollStudentTeacherReq.grade(),
-                    findclass.getId(),
-                    enrollStudentTeacherReq.number()
-            );
-
-            Student savedStudent;
-            // 교사가 등록한 경우
-            if (student.isPresent()) {
-                Student existingStudent = student.get();
-                existingStudent.update(enrollStudentTeacherReq, socialId);
-                savedStudent = studentRepository.save(existingStudent);
-            } else {
-                // 존재하지 않는 경우
-                Student newStudent = Student.create(
-                        findclass.getId(),
-                        enrollStudentTeacherReq.userName(),
-                        enrollStudentTeacherReq.age(),
-                        enrollStudentTeacherReq.grade(),
-                        enrollStudentTeacherReq.address(),
-                        enrollStudentTeacherReq.number(),
-                        socialId,
-                        enrollStudentTeacherReq.gender(),
-                        enrollStudentTeacherReq.birthDate(),
-                        enrollStudentTeacherReq.contact(),
-                        enrollStudentTeacherReq.parentContact()
-                );
-                savedStudent = studentRepository.save(newStudent);
-            }
+            student.updateSocialId(socialId);
+            Student savedStudent = studentRepository.save(student);
 
             Token token = getJwtToken(savedStudent.getId(), UserType.STUDENT);
             return EnrollStudentTeacherRes.of(savedStudent.getId(), token.getAccessToken(), token.getRefreshToken());

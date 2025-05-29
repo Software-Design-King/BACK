@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -33,6 +34,8 @@ public class Student {
 
     private String socialId;
 
+    private String enrollCode;
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "gender", length = 20)
     private Gender gender;
@@ -42,6 +45,13 @@ public class Student {
     private String contact;
 
     private String parentContact;
+
+    @PrePersist
+    public void generateShortCode() {
+        if (this.enrollCode == null) {
+            this.enrollCode = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        }
+    }
 
     public static Student create(
                          final Long classId,
@@ -71,16 +81,7 @@ public class Student {
         this.parentContact = request.getParentContact();
     }
 
-    public void update(EnrollStudentTeacherReq request, String socialId) {
-        this.name = request.userName();
-        this.age = request.age();
-        this.grade = request.grade();
-        this.address = request.address();
+    public void updateSocialId(String socialId) {
         this.socialId = socialId;
-        this.number = request.number();
-        this.gender = request.gender();
-        this.birthDate = request.birthDate();
-        this.contact = request.contact();
-        this.parentContact = request.parentContact();
     }
 }
