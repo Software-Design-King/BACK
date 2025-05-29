@@ -22,7 +22,6 @@ public class TeacherController {
             @UserId final Long userId,
             @RequestBody final EnrollStudentsRequest request
     ) {
-        studentService.enrollStudents(userId, request);
-        return ApiResponseUtil.success(SuccessCode.OK);
+        return ApiResponseUtil.success(SuccessCode.OK, studentService.enrollStudents(userId, request));
     }
 }

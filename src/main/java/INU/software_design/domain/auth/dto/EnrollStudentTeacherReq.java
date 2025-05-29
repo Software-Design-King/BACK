@@ -17,6 +17,7 @@ public record EnrollStudentTeacherReq(
         Gender gender,
         LocalDate birthDate,
         String contact,
-        String parentContact
+        String parentContact,
+        String enrollCode
 ) {
 }

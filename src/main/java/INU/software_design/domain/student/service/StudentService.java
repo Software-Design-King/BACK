@@ -8,6 +8,8 @@ import INU.software_design.domain.Class.entity.Class;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.student.dto.request.EnrollStudentsRequest;
 import INU.software_design.domain.student.dto.request.StudentInfoRequest;
+import INU.software_design.domain.student.dto.response.StudentEnrollListResponse;
+import INU.software_design.domain.student.dto.response.StudentEnrollResponse;
 import INU.software_design.domain.student.dto.response.StudentInfoResponse;
 import INU.software_design.domain.student.dto.response.StudentListResponse;
 import INU.software_design.domain.student.entity.Student;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -54,10 +57,11 @@ public class StudentService {
     }
 
     @Transactional
-    public void enrollStudents(Long teacherId, EnrollStudentsRequest request) {
+    public StudentEnrollListResponse enrollStudents(Long teacherId, EnrollStudentsRequest request) {
         Class clazz = classRepository.findByTeacherId(teacherId).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.NOT_FOUND_ENTITY));
 
         List<EnrollStudentTeacherReq> students = request.getStudents();
+        List<StudentEnrollResponse> enrollResponses = new ArrayList<>();
         students.forEach(student -> {
             if (isDifferentClass(student, clazz) || isNotStudent(student)) {
                 throw new SwPlanUseException(ErrorBaseCode.BAD_REQUEST);
@@ -75,8 +79,10 @@ public class StudentService {
                     student.contact(),
                     student.parentContact()
             );
-            studentRepository.save(newStudent);
+            enrollResponses.add(StudentEnrollResponse.create(studentRepository.save(newStudent), clazz.getClassNumber()));
         });
+
+        return StudentEnrollListResponse.create(enrollResponses);
     }
 
     private int findClassNumberBy(Student student) {
