@@ -1,6 +1,8 @@
 package INU.software_design.domain.attendance.service;
 
 import INU.software_design.common.enums.AttendanceType;
+import INU.software_design.common.exception.SwPlanUseException;
+import INU.software_design.common.response.code.ErrorBaseCode;
 import INU.software_design.domain.attendance.dto.AttendanceSummaryRes;
 import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
@@ -156,5 +158,109 @@ class AttendanceServiceTest {
                 .withFailMessage("예외 메시지가 'Database error'이어야 합니다.");
 
         verify(attendanceRepository).save(Mockito.any(Attendance.class));
+    }
+
+
+    @Test
+    @DisplayName("학생 출결 업데이트 테스트 - 성공")
+    void testUpdateAttendance_Successful() {
+        // given
+        Long studentId = 1L;
+        AttendanceRequest request = AttendanceRequest.builder()
+                .type(AttendanceType.SICK)
+                .date(LocalDate.of(2025, 6, 1).atStartOfDay())
+                .title("병가")
+                .reason("병원 예약")
+                .build();
+
+        Attendance existingAttendance = Attendance.create(studentId, AttendanceType.LATE, request.getDate(), "지각", "대중교통 지연");
+
+        Mockito.when(attendanceRepository.findByStudentIdAndDate(studentId, request.getDate())).thenReturn(java.util.Optional.of(existingAttendance));
+
+        // when
+        AttendanceResponse response = attendanceService.updateAttendance(studentId, request);
+
+        // then
+        assertThat(response).isNotNull().withFailMessage("출결 업데이트 응답이 null이어서는 안 됩니다.");
+        assertThat(response.getType()).isEqualTo(request.getType())
+                .withFailMessage("수정된 출결 유형이 요청과 일치해야 합니다.");
+        assertThat(response.getDate()).isEqualTo(request.getDate().toString())
+                .withFailMessage("수정된 출결 날짜가 요청과 일치해야 합니다.");
+        assertThat(response.getTitle()).isEqualTo(request.getTitle())
+                .withFailMessage("수정된 출결 제목이 요청과 일치해야 합니다.");
+        assertThat(response.getReason()).isEqualTo(request.getReason())
+                .withFailMessage("수정된 출결 사유가 요청과 일치해야 합니다.");
+
+        verify(attendanceRepository).findByStudentIdAndDate(studentId, request.getDate());
+    }
+
+    @Test
+    @DisplayName("학생 출결 업데이트 테스트 - 실패")
+    void testUpdateAttendance_Failure() {
+        // given
+        Long studentId = 1L;
+        AttendanceRequest request = AttendanceRequest.builder()
+                .type(AttendanceType.SICK)
+                .date(LocalDate.of(2025, 6, 1).atStartOfDay())
+                .title("병가")
+                .reason("병원 예약")
+                .build();
+
+        Mockito.when(attendanceRepository.findByStudentIdAndDate(studentId, request.getDate()))
+                .thenReturn(java.util.Optional.empty());
+
+        // when / then
+        SwPlanUseException exception = org.junit.jupiter.api.Assertions.assertThrows(SwPlanUseException.class, () -> {
+            attendanceService.updateAttendance(studentId, request);
+        });
+
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorBaseCode.NOT_FOUND_ENTITY)
+                .withFailMessage("예외 메시지가 'NOT_FOUND_ENTITY'이어야 합니다.");
+
+        verify(attendanceRepository).findByStudentIdAndDate(studentId, request.getDate());
+    }
+
+    @Test
+    @DisplayName("학생 출결 삭제 테스트 - 성공")
+    void testDeleteAttendance_Successful() {
+        // given
+        Long studentId = 1L;
+        LocalDate date = LocalDate.of(2025, 6, 1);
+        Attendance attendance = Attendance.create(studentId, AttendanceType.ABSENT, date.atStartOfDay(), "결석", "사유 없음");
+
+        Mockito.when(attendanceRepository.findByStudentIdAndDateBetween(
+                        studentId, date.atStartOfDay(), date.plusDays(1).atStartOfDay()))
+                .thenReturn(List.of(attendance));
+
+        // when
+        attendanceService.deleteAttendance(studentId, date);
+
+        // then
+        verify(attendanceRepository).findByStudentIdAndDateBetween(
+                studentId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+        verify(attendanceRepository).deleteAll(List.of(attendance));
+    }
+
+    @Test
+    @DisplayName("학생 출결 삭제 테스트 - 실패")
+    void testDeleteAttendance_Failure() {
+        // given
+        Long studentId = 1L;
+        LocalDate date = LocalDate.of(2025, 6, 1);
+
+        Mockito.when(attendanceRepository.findByStudentIdAndDateBetween(
+                        studentId, date.atStartOfDay(), date.plusDays(1).atStartOfDay()))
+                .thenReturn(List.of());
+
+        // when / then
+        SwPlanUseException exception = org.junit.jupiter.api.Assertions.assertThrows(SwPlanUseException.class, () -> {
+            attendanceService.deleteAttendance(studentId, date);
+        });
+
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorBaseCode.NOT_FOUND_ENTITY)
+                .withFailMessage("예외 메시지가 'NOT_FOUND_ENTITY'이어야 합니다.");
+
+        verify(attendanceRepository).findByStudentIdAndDateBetween(
+                studentId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
     }
 }
