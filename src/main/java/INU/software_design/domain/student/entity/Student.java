@@ -64,9 +64,10 @@ public class Student {
                          Gender gender,
                          LocalDate birthDate,
                          String contact,
-                         String parentContact
+                         String parentContact,
+                         String enrollCode
                          ) {
-        return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).birthDate(birthDate).contact(contact).parentContact(parentContact).build();
+        return Student.builder().classId(classId).name(name).age(age).grade(grade).address(address).number(number).socialId(socialId).gender(gender).birthDate(birthDate).contact(contact).parentContact(parentContact).enrollCode(enrollCode).build();
     }
 
     public void update(StudentInfoRequest request) {
