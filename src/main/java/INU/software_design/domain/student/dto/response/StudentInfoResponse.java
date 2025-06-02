@@ -32,10 +32,11 @@ public class StudentInfoResponse {
 
     private int studentNum;
 
+    private String enrollCode;
+
     @Builder
     private StudentInfoResponse(Long studentId, String name, Integer age, String birthDate, Gender gender, String address,
-                               String contact, String entranceDate,
-                               int grade, int classNum, int studentNum) {
+                               String contact, String entranceDate, int grade, int classNum, int studentNum, String enrollCode) {
         this.studentId = studentId;
         this.name = name;
         this.age = age;
@@ -47,6 +48,7 @@ public class StudentInfoResponse {
         this.grade = grade;
         this.classNum = classNum;
         this.studentNum = studentNum;
+        this.enrollCode = enrollCode;
     }
 
     public static StudentInfoResponse of(Student student, Integer classNum) {
@@ -62,6 +64,7 @@ public class StudentInfoResponse {
                 .grade(student.getGrade())
                 .classNum(classNum)
                 .studentNum(student.getNumber())
+                .enrollCode(student.getEnrollCode())
                 .build();
     }
 }
