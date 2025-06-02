@@ -21,7 +21,8 @@ public class TestFactory {
                 Gender.MALE,             // gender
                 LocalDate.of(2009, 5, 12), // birthDate
                 "010-1234-5678",         // contact
-                "010-8765-4321"          // parentContact
+                "010-8765-4321",          // parentContact
+                "111122222"
         );
         setPrivateStudentId(student, id);
         return student;

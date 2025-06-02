@@ -4,6 +4,8 @@ import INU.software_design.common.enums.AttendanceType;
 import INU.software_design.domain.attendance.dto.AttendanceSummaryRes;
 import INU.software_design.domain.attendance.entity.Attendance;
 import INU.software_design.domain.attendance.repository.AttendanceRepository;
+import INU.software_design.domain.student.dto.request.AttendanceRequest;
+import INU.software_design.domain.student.dto.response.AttendanceResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -98,5 +98,63 @@ class AttendanceServiceTest {
         assertThat(response.leaveCount()).isEqualTo(0);
         assertThat(response.sickCount()).isEqualTo(0);
         assertThat(response.details()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("학생 출결 등록 테스트 - 성공")
+    void testRegisterAttendance_Successful() {
+        // given
+        Long studentId = 1L;
+        AttendanceRequest request = AttendanceRequest.builder()
+                .type(AttendanceType.LATE)
+                .date(LocalDate.of(2025, 6, 1).atStartOfDay())
+                .title("지각")
+                .reason("늦잠")
+                .build();
+
+        Attendance attendance = Attendance.of(studentId, request);
+        Mockito.when(attendanceRepository.save(Mockito.any(Attendance.class))).thenReturn(attendance);
+
+        // when
+        AttendanceResponse response = attendanceService.registerAttendance(studentId, request);
+
+        // then
+        assertThat(response).isNotNull().withFailMessage("출결 등록 응답이 null이어서는 안 됩니다.");
+        assertThat(response.getType()).isEqualTo(request.getType())
+                .withFailMessage("등록된 출결 유형이 요청과 일치해야 합니다.");
+        assertThat(response.getDate()).isEqualTo(request.getDate().toString())
+                .withFailMessage("등록된 출결 날짜가 요청과 일치해야 합니다.");
+        assertThat(response.getTitle()).isEqualTo(request.getTitle())
+                .withFailMessage("등록된 출결 제목이 요청과 일치해야 합니다.");
+        assertThat(response.getReason()).isEqualTo(request.getReason())
+                .withFailMessage("등록된 출결 사유가 요청과 일치해야 합니다.");
+
+        verify(attendanceRepository).save(Mockito.any(Attendance.class));
+    }
+
+    @Test
+    @DisplayName("학생 출결 등록 테스트 - 실패")
+    void testRegisterAttendance_Failure() {
+        // given
+        Long studentId = 1L;
+        AttendanceRequest request = AttendanceRequest.builder()
+                .type(AttendanceType.LATE)
+                .date(LocalDate.of(2025, 6, 1).atStartOfDay())
+                .title("지각")
+                .reason("늦잠")
+                .build();
+
+        Mockito.when(attendanceRepository.save(Mockito.any(Attendance.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // when / then
+        RuntimeException exception = org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> {
+            attendanceService.registerAttendance(studentId, request);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("Database error")
+                .withFailMessage("예외 메시지가 'Database error'이어야 합니다.");
+
+        verify(attendanceRepository).save(Mockito.any(Attendance.class));
     }
 }

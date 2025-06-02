@@ -74,6 +74,8 @@ class AuthServiceTest {
                 .grade(3)
                 .number(10)
                 .classId(2L)
+                .socialId("social-id")
+                .enrollCode("11112222")
                 .build();
 
         testStudent = TestFactory.create(2L, student);
@@ -102,7 +104,8 @@ class AuthServiceTest {
                 Gender.MALE,
                 LocalDate.of(2005, 5, 20),
                 "010-1234-5678",
-                "010-9876-5432"
+                "010-9876-5432",
+                "11112222"
         );
     }
 
@@ -344,7 +347,7 @@ class AuthServiceTest {
 
         // then
         assertEquals("최선생", response.userName());
-        assertEquals(UserType.PARENT, response.userType());
+        assertEquals(UserType.TEACHER, response.userType());
         assertEquals(5, response.grade());
         assertEquals(1, response.classNum());
         assertEquals("access-token", response.acceessToken());
@@ -406,7 +409,8 @@ class AuthServiceTest {
                 Gender.MALE,
                 LocalDate.of(2005, 5, 20),
                 "010-1234-5678",
-                "010-9876-5432"
+                "010-9876-5432",
+                "11112222"
         );
 
         Class testClass = Class.builder()
@@ -426,7 +430,8 @@ class AuthServiceTest {
                 request.gender(),
                 request.birthDate(),
                 request.contact(),
-                request.parentContact()
+                request.parentContact(),
+                request.enrollCode()
         );
         Student student = TestFactory.create(1L, tempStudent);
 
@@ -445,15 +450,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("학생 등록 실패 테스트 - 반 조회 실패")
+    @DisplayName("학생 등록 실패 테스트 - 등록 코드 불일치")
     void enrollStudent_ClassNotFound() {
         // given
-        when(feignProvider.getKakaoTokenInfo("kakao-token")).thenReturn("social-id");
-        when(classRepository.findByGradeAndClassNumber(3, 5)).thenReturn(Optional.empty());
+        when(studentRepository.findByEnrollCode("11112222")).thenReturn(Optional.empty());
 
         // when/then
         SwPlanUseException exception = assertThrows(SwPlanUseException.class, () -> authService.enrollStudentTeacher(enrollStudentTeacherReq));
-        assertEquals(ErrorBaseCode.BAD_REQUEST, exception.getErrorCode());
+        assertEquals(ErrorBaseCode.NOT_FOUND_ENTITY, exception.getErrorCode());
     }
 
     @Test
@@ -483,7 +487,8 @@ class AuthServiceTest {
                 Gender.MALE,
                 LocalDate.of(2005, 5, 20),
                 "010-1234-5678",
-                "010-9876-5432"
+                "010-9876-5432",
+                "11112222"
         );
 
         Class testClass = Class.builder()
@@ -503,10 +508,12 @@ class AuthServiceTest {
                 request.gender(),
                 request.birthDate(),
                 request.contact(),
-                request.parentContact()
+                request.parentContact(),
+                request.enrollCode()
         );
         Student student = TestFactory.create(1L, tempStudent);
 
+        when(studentRepository.findByEnrollCode("11112222")).thenReturn(Optional.of(student));
         when(feignProvider.getKakaoTokenInfo("kakao-token")).thenReturn("social-id");
         when(classRepository.findByGradeAndClassNumber(3, 5)).thenReturn(Optional.of(testClass));
         when(studentRepository.save(any(Student.class))).thenReturn(student);
@@ -537,7 +544,8 @@ class AuthServiceTest {
                 Gender.MALE,
                 LocalDate.of(2005, 5, 20),
                 "010-1234-5678",
-                "010-9876-5432"
+                "010-9876-5432",
+                "11112222"
         );
 
         Class testClass = Class.builder()
@@ -557,7 +565,8 @@ class AuthServiceTest {
                 request.gender(),
                 request.birthDate(),
                 request.contact(),
-                request.parentContact()
+                request.parentContact(),
+                request.enrollCode()
         );
         Student student = TestFactory.create(1L, tempStudent);
 
@@ -597,6 +606,7 @@ class AuthServiceTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -619,6 +629,7 @@ class AuthServiceTest {
                 UserType.TEACHER,
                 null,
                 "kakao-token",
+                null,
                 null,
                 null,
                 null,
@@ -731,5 +742,159 @@ class AuthServiceTest {
         // when/then
         SwPlanUseException exception = assertThrows(SwPlanUseException.class, () -> authService.enrollParent(request), "SwPlanUseException은 반드시 발생해야 합니다.");
         assertEquals(ErrorBaseCode.BAD_REQUEST, exception.getErrorCode(), "올바른 에러 코드가 반환되지 않았습니다.");
+    }
+
+    @Test
+    @DisplayName("학생 등록 성공 테스트")
+    void enrollStudentTeacher_Success_Student() {
+        // given
+        EnrollStudentTeacherReq request = new EnrollStudentTeacherReq(
+                "홍길동",
+                3,
+                5,
+                22,
+                UserType.STUDENT,
+                18,
+                "valid-kakao-token",
+                "address",
+                Gender.MALE,
+                LocalDate.of(2005, 5, 20),
+                "010-1234-5678",
+                "010-9876-5432",
+                "test-enroll-code"
+        );
+        Student student = Student.builder()
+                .id(1L)
+                .enrollCode("test-enroll-code")
+                .socialId("existing-social-id")
+                .build();
+
+        when(feignProvider.getKakaoTokenInfo("valid-kakao-token")).thenReturn("valid-social-id");
+        when(studentRepository.findByEnrollCode("test-enroll-code")).thenReturn(Optional.of(student));
+        when(studentRepository.save(any(Student.class))).thenReturn(student);
+        when(jwtProvider.issueToken(1L, UserType.STUDENT)).thenReturn(new INU.software_design.common.enums.Token("access-token", "refresh-token"));
+
+        // when
+        EnrollStudentTeacherRes response = authService.enrollStudentTeacher(request);
+
+        // then
+        assertEquals(1L, response.userId(), "학생 ID는 반드시 1이어야 합니다.");
+        assertEquals("access-token", response.accessToken(), "실패: 액세스토큰이 올바르지 않습니다.");
+        assertEquals("refresh-token", response.refreshToken(), "실패: 리프레시토큰이 올바르지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("학생 등록 실패 테스트 - 등록 코드로 학생을 찾지 못한 경우")
+    void enrollStudentTeacher_Failure_Student_NotFound() {
+        // given
+        EnrollStudentTeacherReq request = new EnrollStudentTeacherReq(
+                "홍길동",
+                3,
+                5,
+                22,
+                UserType.STUDENT,
+                18,
+                "kakao-token",
+                "address",
+                Gender.MALE,
+                LocalDate.of(2005, 5, 20),
+                "010-1234-5678",
+                "010-9876-5432",
+                "invalid-enroll-code"
+        );
+
+        when(studentRepository.findByEnrollCode("invalid-enroll-code")).thenReturn(Optional.empty());
+
+        // when/then
+        SwPlanUseException exception = assertThrows(
+                SwPlanUseException.class,
+                () -> authService.enrollStudentTeacher(request),
+                "학생이 존재하지 않는 경우 예외가 발생해야 합니다."
+        );
+        assertEquals(ErrorBaseCode.NOT_FOUND_ENTITY, exception.getErrorCode(), "적합한 에러 코드가 반환되지 않았습니다.");
+    }
+
+    @Test
+    @DisplayName("교사 등록 성공 테스트")
+    void enrollStudentTeacher_Success_Teacher() {
+        // given
+        EnrollStudentTeacherReq request = new EnrollStudentTeacherReq(
+                "Jane Doe",
+                4,
+                3,
+                null,
+                UserType.TEACHER,
+                null,
+                "teacher-kakao-token",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        Teacher newTeacher = Teacher.create(
+                "Jane Doe",
+                "social-id-teacher"
+        );
+
+        Class teacherClass = Class.builder()
+                .id(10L)
+                .grade(4)
+                .classNumber(3)
+                .teacherId(1L)
+                .build();
+
+        when(feignProvider.getKakaoTokenInfo("teacher-kakao-token")).thenReturn("social-id-teacher");
+        when(teacherRepository.save(any(Teacher.class))).thenReturn(newTeacher);
+        when(classRepository.findByGradeAndClassNumber(4, 3)).thenReturn(Optional.of(teacherClass));
+        when(jwtProvider.issueToken(10L, UserType.TEACHER)).thenReturn(new INU.software_design.common.enums.Token("access-token", "refresh-token"));
+
+        // when
+        EnrollStudentTeacherRes response = authService.enrollStudentTeacher(request);
+
+        // then
+        assertEquals("access-token", response.accessToken(), "액세스토큰이 일치하지 않습니다.");
+        assertEquals("refresh-token", response.refreshToken(), "리프레시토큰이 일치하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("교사 등록 실패 테스트 - 해당 반이 이미 다른 교사로 등록된 경우")
+    void enrollStudentTeacher_Failure_Teacher_DuplicateClass() {
+        // given
+        EnrollStudentTeacherReq request = new EnrollStudentTeacherReq(
+                "Jane Doe",
+                4,
+                2,
+                null,
+                UserType.TEACHER,
+                null,
+                "existing-kakao-token",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        Class testClass = Class.builder()
+                .id(1L)
+                .grade(4)
+                .classNumber(2)
+                .teacherId(2L)  // Already assigned to another teacher
+                .build();
+
+        when(feignProvider.getKakaoTokenInfo("existing-kakao-token")).thenReturn("social-id");
+        when(classRepository.findByGradeAndClassNumber(4, 2)).thenReturn(Optional.of(testClass));
+
+        // when/then
+        SwPlanUseException exception = assertThrows(
+                SwPlanUseException.class,
+                () -> authService.enrollStudentTeacher(request),
+                "이미 다른 교사로 등록된 반의 경우 예외가 발생해야 합니다."
+        );
+        assertEquals(ErrorBaseCode.CONFLICT, exception.getErrorCode(), "적합한 에러 코드가 반환되지 않았습니다.");
     }
 }
