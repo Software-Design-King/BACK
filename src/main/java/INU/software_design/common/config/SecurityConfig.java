@@ -26,7 +26,8 @@ public class SecurityConfig {
             "/actuator/health",
             "/user/login",
             "user/enroll/student-teacher",
-            "/enroll/parent"
+            "/enroll/parent",
+            "/actuator/prometheus"
     };
 
     @Bean
