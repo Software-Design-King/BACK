@@ -185,7 +185,8 @@ public class AuthService {
                 student.getName(),
                 student.getGrade() + "학년 " + classNumber + "반",
                 student.getNumber(), // 이게 학생 번호
-                UserType.STUDENT
+                UserType.STUDENT,
+                student.getId()
         );
     }
 
@@ -199,7 +200,8 @@ public class AuthService {
         return UserInfoRes.of(
                 parent.getName(),
                 child.getName() + " 학생의 학부모",
-                UserType.PARENT
+                UserType.PARENT,
+                parent.getId()
         );
     }
 
@@ -213,7 +215,8 @@ public class AuthService {
         return UserInfoRes.of(
                 teacher.getName(),
                 clazz.getGrade() + "학년 " + clazz.getClassNumber() + "반 담임",
-                UserType.TEACHER
+                UserType.TEACHER,
+                teacher.getId()
         );
     }
 
