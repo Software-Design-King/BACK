@@ -78,7 +78,7 @@ public class StudentService {
                     student.birthDate(),
                     student.contact(),
                     student.parentContact(),
-                    student.enrollCode()
+                    null
             );
             enrollResponses.add(StudentEnrollResponse.create(studentRepository.save(newStudent), clazz.getClassNumber()));
         });
