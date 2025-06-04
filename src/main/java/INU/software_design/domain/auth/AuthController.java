@@ -9,6 +9,9 @@ import INU.software_design.domain.auth.dto.EnrollParent;
 import INU.software_design.domain.auth.dto.EnrollStudentTeacherReq;
 import INU.software_design.domain.auth.dto.LoginSuccessRes;
 import feign.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Tag(name = "인증", description = "인증 관련 API")
 public class AuthController {
     private final AuthService authService;
 
-    //로그인
+    @Operation(summary = "로그인", description = "카카오 로그인을 수행합니다.")
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<?>> login(
-            @RequestHeader(value = "Authorization") final String authorization,
-            @RequestHeader(value = "Redirecturl") final String redirectUrl
+            @Parameter(description = "카카오 인증 토큰") @RequestHeader(value = "Authorization") final String authorization,
+            @Parameter(description = "리다이렉트 URL") @RequestHeader(value = "Redirecturl") final String redirectUrl
             ) {
         return ApiResponseUtil.success(
                 SuccessCode.OK,
@@ -31,10 +35,10 @@ public class AuthController {
         );
     }
 
-    //학생/교사 등록
+    @Operation(summary = "학생/교사 등록", description = "학생 또는 교사 계정을 등록합니다.")
     @PostMapping("/enroll/student-teacher")
     public ResponseEntity<BaseResponse<?>> enrollStudentTeacher(
-            @RequestBody final EnrollStudentTeacherReq enrollStudentTeacherReq
+            @Parameter(description = "학생/교사 등록 정보") @RequestBody final EnrollStudentTeacherReq enrollStudentTeacherReq
             ) {
         return ApiResponseUtil.success(
                 SuccessCode.CREATED,
@@ -42,10 +46,10 @@ public class AuthController {
         );
     }
 
-    //부모 등록
+    @Operation(summary = "부모 등록", description = "부모 계정을 등록합니다.")
     @PostMapping("/enroll/parent")
     public ResponseEntity<BaseResponse<?>> enrollParent(
-            @RequestBody final EnrollParent enrollParent
+            @Parameter(description = "부모 등록 정보") @RequestBody final EnrollParent enrollParent
     ) {
         authService.enrollParent(enrollParent);
         return ApiResponseUtil.success(
@@ -53,11 +57,11 @@ public class AuthController {
         );
     }
 
-    //유저 정보 조회
+    @Operation(summary = "유저 정보 조회", description = "현재 로그인한 유저의 정보를 조회합니다.")
     @GetMapping("/info")
     public ResponseEntity<BaseResponse<?>> getUserInfo(
-            @UserId final Long userId,
-            @UserType final INU.software_design.common.enums.UserType userType
+            @Parameter(description = "유저 ID") @UserId final Long userId,
+            @Parameter(description = "유저 타입") @UserType final INU.software_design.common.enums.UserType userType
     ) {
         return ApiResponseUtil.success(
                 SuccessCode.OK,

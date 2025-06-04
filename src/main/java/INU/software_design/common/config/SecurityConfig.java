@@ -27,7 +27,11 @@ public class SecurityConfig {
             "/user/login",
             "user/enroll/student-teacher",
             "/enroll/parent",
-            "/actuator/prometheus"
+            "/actuator/prometheus",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui.html"
     };
 
     @Bean
@@ -43,6 +47,7 @@ public class SecurityConfig {
                         exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
+                                .requestMatchers(whiteList).permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)

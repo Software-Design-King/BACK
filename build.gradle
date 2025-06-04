@@ -43,6 +43,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	
+	// Swagger 의존성 추가
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	
 }
 
 tasks.named('test') {
