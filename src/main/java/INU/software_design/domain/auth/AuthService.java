@@ -149,13 +149,8 @@ public class AuthService {
     public void enrollParent(final EnrollParent enrollParent) {
         String socialId = getSocialId(enrollParent.kakaoToken());
 
-        Class clazz = classRepository.findByGradeAndClassNumber(enrollParent.grade(), enrollParent.classNum())
-                .orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
-
         // 2. Student 정보 조회
-        Student student = studentRepository.findByNameAndGradeAndNumberAndClassId(
-                enrollParent.childName(), enrollParent.grade(), enrollParent.number(), clazz.getId()
-        ).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
+        Student student = studentRepository.findByEnrollCode(enrollParent.studentRegisterCode()).orElseThrow(() -> new SwPlanUseException(ErrorBaseCode.BAD_REQUEST));
 
         // 3. Parent 엔티티 생성 및 저장
         Parent parent = Parent.builder()
@@ -201,7 +196,8 @@ public class AuthService {
                 parent.getName(),
                 child.getName() + " 학생의 학부모",
                 UserType.PARENT,
-                parent.getId()
+                parent.getId(), // 부모 아이디
+                parent.getStudentId() // 학생 아이디
         );
     }
 
